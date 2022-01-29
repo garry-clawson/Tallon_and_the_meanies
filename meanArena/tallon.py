@@ -1,3 +1,14 @@
+# ----------------- Start Student Details -----------------------------
+
+# Name:     Garry Clawson
+# ID:       18685030
+# Date:     29th Jan 2022
+# Module:   CMP9132M
+# Title:    AAI Assignment 2
+# Version:  0.1.0
+
+# ----------------- End Student Details -----------------------------
+#
 # tallon.py
 #
 # The code that defines the behaviour of Tallon. This is the place
@@ -6,6 +17,7 @@
 #
 # Written by: Simon Parsons
 # Last Modified: 12/01/22
+
 
 import world
 import random
