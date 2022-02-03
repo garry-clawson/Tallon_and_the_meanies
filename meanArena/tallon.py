@@ -39,16 +39,25 @@ class Tallon():
         # This is the function you need to define
 
         # For now we have a placeholder, which always moves Tallon
-        # directly towards any existing bonuses. It ignores Meanies
+        # directly towards any existing bonuses. 
+        # It ignores Meanies  >> GC we need to upade this to caputure thoise probabalistic pit action
         # and pits.
         # 
         # Get the location of the Bonuses.
         allBonuses = self.gameWorld.getBonusLocation()
 
+        # GC test to see what is occuring here??
+        print("Print allbonusus", allBonuses)
+
+        
         # if there are still bonuses, move towards the next one.
         if len(allBonuses) > 0:
             nextBonus = allBonuses[0]
             myPosition = self.gameWorld.getTallonLocation()
+
+            # GC test of position
+            print("my position", myPosition)
+
             # If not at the same x coordinate, reduce the difference
             if nextBonus.x > myPosition.x:
                 return Directions.EAST
