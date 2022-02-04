@@ -58,15 +58,19 @@ class Tallon():
             # GC test of position
             print("my position", myPosition)
 
+        # if there are still bonuses, move towards the next one.
+        if len(allBonuses) > 0:
+            nextBonus = allBonuses[0]
+            myPosition = self.gameWorld.getTallonLocation()
             # If not at the same x coordinate, reduce the difference
             if nextBonus.x > myPosition.x:
                 return Directions.EAST
             if nextBonus.x < myPosition.x:
                 return Directions.WEST
             # If not at the same y coordinate, reduce the difference
-            if nextBonus.y > myPosition.y:
-                return Directions.NORTH
             if nextBonus.y < myPosition.y:
+                return Directions.NORTH
+            if nextBonus.y > myPosition.y:
                 return Directions.SOUTH
 
         # if there are no more bonuses, Tallon doesn't move
