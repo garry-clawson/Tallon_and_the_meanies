@@ -52,7 +52,7 @@ class Tallon():
         
         # if there are still bonuses, move towards the next one.
         if len(allBonuses) > 0:
-            nextBonus = allBonuses[0]
+            nextBonus = allBonuses[0] #i.e. the next bonus is the one at the start of the array (how are they apended?)
             myPosition = self.gameWorld.getTallonLocation()
 
             # GC test of position
@@ -63,6 +63,8 @@ class Tallon():
             nextBonus = allBonuses[0]
             myPosition = self.gameWorld.getTallonLocation()
             # If not at the same x coordinate, reduce the difference
+
+            # East is left in the map and should be to avoid an enemy
             if nextBonus.x > myPosition.x:
                 return Directions.EAST
             if nextBonus.x < myPosition.x:
@@ -74,3 +76,4 @@ class Tallon():
                 return Directions.SOUTH
 
         # if there are no more bonuses, Tallon doesn't move
+        # The bonuses are made up of an array list - check how this builds up?
