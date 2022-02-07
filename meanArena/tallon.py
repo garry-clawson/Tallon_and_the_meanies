@@ -39,7 +39,7 @@ class Tallon():
         # This is the function you need to define
 
         # For now we have a placeholder, which always moves Tallon
-        # directly towards any existing bonuses. 
+        # directly towards any existing bonuses. << GC this is key
         # It ignores Meanies  >> GC we need to upade this to caputure thoise probabalistic pit action
         # and pits.
         # 
@@ -50,29 +50,33 @@ class Tallon():
         print("Print allbonusus", allBonuses)
 
         
-        # if there are still bonuses, move towards the next one.
+        # if there are still bonuses, move towards the next one. << GC  one position in the grid at a time
         if len(allBonuses) > 0:
-            nextBonus = allBonuses[0] #i.e. the next bonus is the one at the start of the array (how are they apended?)
+            nextBonus = allBonuses[0] #GC i.e. the next bonus is the one at the start of the array (how are they apended?)
             myPosition = self.gameWorld.getTallonLocation()
 
             # GC test of position
             print("my position", myPosition)
 
-        # if there are still bonuses, move towards the next one.
+        # if there are still bonuses, move towards the next one. << GC does this include the 0.95 probablity aspect?
         if len(allBonuses) > 0:
             nextBonus = allBonuses[0]
             myPosition = self.gameWorld.getTallonLocation()
             # If not at the same x coordinate, reduce the difference
 
-            # East is left in the map and should be to avoid an enemy
+            # GC East is left in the map and should be to avoid an enemy
             if nextBonus.x > myPosition.x:
-                return Directions.EAST
+                print("EAST", Directions.EAST) # << GC test to see what a direction is. Expect 0-4 here?
+                return Directions.EAST 
             if nextBonus.x < myPosition.x:
+                print("WEST", Directions.WEST) # << GC test to see what a direction is. Expect 0-4 here?
                 return Directions.WEST
             # If not at the same y coordinate, reduce the difference
             if nextBonus.y < myPosition.y:
+                print("NORTH", Directions.NORTH) # << GC test to see what a direction is. Expect 0-4 here?
                 return Directions.NORTH
             if nextBonus.y > myPosition.y:
+                print("SOUTH", Directions.SOUTH) # << GC test to see what a direction is. Expect 0-4 here?
                 return Directions.SOUTH
 
         # if there are no more bonuses, Tallon doesn't move
