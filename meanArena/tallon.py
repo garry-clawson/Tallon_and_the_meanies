@@ -80,4 +80,4 @@ class Tallon():
                 return Directions.SOUTH
 
         # if there are no more bonuses, Tallon doesn't move
-        # The bonuses are made up of an array list - check how this builds up?
+        # GC The bonuses are made up of an array list - check how this builds up?
