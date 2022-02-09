@@ -44,6 +44,22 @@ class Tallon():
         # and pits.
         # 
         # Get the location of the Bonuses.
+
+        # ------ GC NOTES ----------------
+        #
+        # Process: Think bellman equation, value iteration, stragty and policies
+        # Find the current states of the grid
+        # then calculate the stae values and probablities
+        # move acoording to what the baddies can do if they are near you
+        # if you have found all the bonuesses then keep moving away
+        # focuis on the whlole stae first - yuse example in workshgop on grid
+        # do alittle at a time - test to see how the movements work - cghange it so only move forward etc
+        #
+        #
+        #
+        #
+        # -----GC END NOTES --------------
+
         allBonuses = self.gameWorld.getBonusLocation()
 
         # GC test to see what is occuring here??
