@@ -12,7 +12,7 @@ worldLength = 10
 worldBreadth = 10
 
 # Features
-numberOfMeanies = 0 #1 # How many we start with
+numberOfMeanies = 1 # How many we start with
 numberOfPits = 3
 numberOfBonuses = 3
 
@@ -25,7 +25,7 @@ dynamic = True
 #
 # If partialVisibility is True, Tallon will only see part of the
 # environment.
-partialVisibility = True
+partialVisibility = False #True
 #
 # The limits of visibility when visibility is partial
 visibilityLimit = 6
