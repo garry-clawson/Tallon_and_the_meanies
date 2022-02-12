@@ -72,13 +72,12 @@ def gridWorld(self):
     getMeanieStates(self, aisles)
     getTallonState(self, aisles)
     getPitsStates(self, aisles)
-    getBonusStates(self, aisles, rewards)
+    getBonusStates(self, rewards)
     
     #set the rewards for all aisle locations (i.e., all non pit or meanie positions)
     for row_index in range(0, 10):
         for column_index in aisles[row_index]:
             rewards[row_index, column_index] = -1.
-
 
     #print rewards matrix
     for row in rewards:
@@ -119,7 +118,7 @@ def getPitsStates(self, aisles):
         aisles[y].append(x)
 
 #GC Get bonus state/position and add this to the aisles grid
-def getBonusStates(self, aisles, rewards):
+def getBonusStates(self, rewards):
     #print("Bonus state:")
     for i in range(len(self.gameWorld.getBonusLocation())):
         #print(self.gameWorld.getMeanieLocation()[i].x)
@@ -127,7 +126,6 @@ def getBonusStates(self, aisles, rewards):
         x = self.gameWorld.getBonusLocation()[i].x
         y = self.gameWorld.getBonusLocation()[i].y
         rewards[y, x] = 99.
-        #aisles[y].append(x)
 
 #GC Get current state of arena so we can add the objects to the grid for the q-values
 def printGameState(self):
