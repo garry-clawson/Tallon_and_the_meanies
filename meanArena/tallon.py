@@ -54,7 +54,8 @@ def gridWorld(self):
     #define aisle locations (i.e., white squares) for rows 1 through 9
     aisles = {} #store locations in a dictionary
 
-    #getMeanieStates(self, aisles)
+    # GC Create blank ppsistions for the grid to initialsie
+    # we will fill them up by getting the states of the meanies/tollen/pist and bonusses
 
     aisles[0] = []
     aisles[1] = []
@@ -67,16 +68,19 @@ def gridWorld(self):
     aisles[8] = []
     aisles[9] = []
     
-    
-    # update the states of the arena so we can add the objects to the grid for the q-values
-    #getTallonState(self, aisles)
+    # define the states of the arena so we can add the objects to the grid for the q-values
     getMeanieStates(self, aisles)
+    getPitsStates(self, aisles)
     
-    
-    #set the rewards for all aisle locations (i.e., white squares)
+    #set the rewards for all aisle locations (i.e., all non pit or meanie positions)
     for row_index in range(0, 10):
         for column_index in aisles[row_index]:
             rewards[row_index, column_index] = -1.
+
+    # update the stae of the arena with tallon and bonus states
+    getTallonState(self, aisles)
+    getBonusStates(self, aisles)
+    
     
 
     #print rewards matrix
@@ -106,6 +110,27 @@ def getMeanieStates(self, aisles):
         x = self.gameWorld.getMeanieLocation()[i].x
         y = self.gameWorld.getMeanieLocation()[i].y
         aisles[y].append(x)
+
+#GC Get bonus state/position and add this to the aisles grid
+def getBonusStates(self, aisles):
+    #print("Bonus state:")
+    for i in range(len(self.gameWorld.getBonusLocation())):
+        #print(self.gameWorld.getMeanieLocation()[i].x)
+        #print(self.gameWorld.getMeanieLocation()[i].y)
+        x = self.gameWorld.getBonusLocation()[i].x
+        y = self.gameWorld.getBonusLocation()[i].y
+        aisles[y].append(x)
+
+#GC Get pit state/position and add this to the aisles grid
+def getPitsStates(self, aisles):
+    #print("Pit state:")
+    for i in range(len(self.gameWorld.getPitsLocation())):
+        #print(self.gameWorld.getMeanieLocation()[i].x)
+        #print(self.gameWorld.getMeanieLocation()[i].y)
+        x = self.gameWorld.getPitsLocation()[i].x
+        y = self.gameWorld.getPitsLocation()[i].y
+        aisles[y].append(x)
+
 
 
 #GC Get current state of arena so we can add the objects to the grid for the q-values
