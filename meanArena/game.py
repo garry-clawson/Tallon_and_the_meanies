@@ -34,6 +34,6 @@ while not(gameWorld.isEnded()):
     display.update()
     # Uncomment this for a printout of world state every step
     #utils.printGameState(gameWorld)
-    time.sleep(1)
+    time.sleep(3)
 
 print("Final score:", gameWorld.getScore())
