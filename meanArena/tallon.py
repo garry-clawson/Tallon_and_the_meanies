@@ -20,6 +20,7 @@
 
 
 # GC imports
+from re import X
 import numpy as np
 
 # Original imports
@@ -33,8 +34,8 @@ from utils import Directions
 def gridWorld(self):
 
     # ------------------ define the shape of the environment (i.e., its states) -------------------------
-    environment_rows = self.gameWorld.maxX # direction of a row is > top to bottom
-    environment_columns = self.gameWorld.maxY # direction of a colum is > left to right
+    environment_rows = self.gameWorld.maxX + 1 # direction of a row is > top to bottom
+    environment_columns = self.gameWorld.maxY + 1 # direction of a colum is > left to right
 
     #Create a 3D numpy array to hold the current Q-values for each state and action pair: Q(s, a) 
     #The array contains 11 rows and 11 columns (to match the shape of the environment), as well as a third "action" dimension.
@@ -45,37 +46,68 @@ def gridWorld(self):
 
 
     # -------------------- Create a 2D numpy array to hold the rewards for each state -------------------------
-    #The array contains 11 rows and 11 columns (to match the shape of the environment), and each value is initialized to -100.
+    #The array contains 10 rows and 10 columns (to match the shape of the environment), and each value is initialized to -100.
     rewards = np.full((environment_rows, environment_columns), -100.)
+
     rewards[0, 5] = 100. #set the reward for the packaging area (i.e., the goal) to 100
 
     #define aisle locations (i.e., white squares) for rows 1 through 9
     aisles = {} #store locations in a dictionary
-    aisles[1] = [i for i in range(0, 9)]
-    aisles[2] = [1, 7, 9]
-    aisles[3] = [i for i in range(1, 8)]
-    aisles[3].append(9)
-    aisles[4] = [3, 7]
-    aisles[5] = [i for i in range(9)]
+
+    getMeanieStates(self, aisles)
+
+    getTallonState(self, aisles)
+
+    '''
+    aisles[1] = [1, 2, 3, 4, 5, 6, 7, 8]
+    aisles[2] = [1, 7, 8]
+    aisles[3] = [1, 2, 3, 4, 5, 6, 7]
+    aisles[4] = [3, 4]
+    aisles[5] = [0, 1, 2, 3, 4, 5, 6, 7, 8]
     aisles[6] = [5]
-    aisles[7] = [i for i in range(1, 9)]
+    aisles[7] = [1, 2, 3, 4, 5, 6, 7, 8]
     aisles[8] = [3, 7]
-    aisles[9] = [i for i in range(9)]
+   
 
     #set the rewards for all aisle locations (i.e., white squares)
-    for row_index in range(0, 9):
+    for row_index in range(1, 9):
         for column_index in aisles[row_index]:
             rewards[row_index, column_index] = -1.
-    
+    '''
+        
     #print rewards matrix
     for row in rewards:
         print(row)
+
+    print(aisles)
 
 
 
 
 # ================ GC end global variables ====================
 
+#GC Get meenie state and add to the aisles grid
+def getMeanieStates(self, aisles):
+    print("Meanies state:")
+    for i in range(len(self.gameWorld.getMeanieLocation())):
+        value = self.gameWorld.getMeanieLocation()[i]
+        print(self.gameWorld.getMeanieLocation()[i].x)
+        print(self.gameWorld.getMeanieLocation()[i].y)
+
+
+
+#GC Get tellon state and add to the aisles grid
+def getTallonState(self, aisles):
+    print("Tallon state:")
+    self.gameWorld.getTallonLocation().print()
+    print(self.gameWorld.getTallonLocation().x)
+    print(self.gameWorld.getTallonLocation().y)
+
+
+
+
+ 
+        
 
 
 #GC Get current state of arena so we can add the objects to the grid for the q-values
