@@ -346,8 +346,8 @@ class Tallon():
 
             # GC prints shortest path after the q_learnign has completed
             # the shortest path is form tallons current location in the grid
-            #print(get_shortest_path(self.gameWorld.getTallonLocation().x, self.gameWorld.getTallonLocation().y)) 
-            print(get_shortest_path(0, 0)) 
+            print(get_shortest_path(self.gameWorld.getTallonLocation().x, self.gameWorld.getTallonLocation().y)) 
+
 
 
 
