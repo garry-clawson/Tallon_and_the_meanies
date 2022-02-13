@@ -59,8 +59,8 @@ def gridWorld(self):
     global rewards, q_values, environment_columns, environment_rows
 
     # ------------------ define the shape of the environment (i.e., its states) -------------------------
-    environment_rows = self.gameWorld.maxX + 1# direction of a row is > top to bottom
-    environment_columns = self.gameWorld.maxY + 1# direction of a colum is > left to right
+    environment_rows = self.gameWorld.maxY + 1# direction of a row is > top to bottom
+    environment_columns = self.gameWorld.maxX + 1# direction of a colum is > left to right
 
     #Create a 3D numpy array to hold the current Q-values for each state and action pair: Q(s, a) 
     #The array contains 11 rows and 11 columns (to match the shape of the environment), as well as a third "action" dimension.
@@ -77,31 +77,31 @@ def gridWorld(self):
     #rewards[0, 5] = 100. #set the reward for the packaging area (i.e., the goal) to 100
 
     #define aisle locations (i.e., white squares) for rows 1 through 9
-    aisles = {} #store locations in a dictionary
+    aisles_rows = {} #store locations in a dictionary
 
     # GC Create blank posistions for the grid to initialsie
     # we will fill them up by getting the states of the meanies/tollen/pist and bonusses
 
-    aisles[0] = []
-    aisles[1] = []
-    aisles[2] = []
-    aisles[3] = []
-    aisles[4] = []
-    aisles[5] = []
-    aisles[6] = []
-    aisles[7] = []
-    aisles[8] = []
-    aisles[9] = []
+    aisles_rows[0] = []
+    aisles_rows[1] = []
+    aisles_rows[2] = []
+    aisles_rows[3] = []
+    aisles_rows[4] = []
+    aisles_rows[5] = []
+    aisles_rows[6] = []
+    aisles_rows[7] = []
+    aisles_rows[8] = []
+    aisles_rows[9] = []
     
     # define the states of the arena so we can add the objects to the grid for the q-values
-    getMeanieStates(self, aisles)
+    getMeanieStates(self, aisles_rows)
     getTallonState(self, rewards)
-    getPitsStates(self, aisles)
+    getPitsStates(self, aisles_rows)
     getBonusStates(self, rewards)
     
     #set the rewards for all aisle locations (i.e., all non pit or meanie positions)
     for row_index in range(0, 10):
-        for column_index in aisles[row_index]:
+        for column_index in aisles_rows[row_index]:
             rewards[row_index, column_index] = -100.
 
     #print rewards matrix in terminal so we can see where the meanies and pits etc are for our q_learning
@@ -120,28 +120,27 @@ def getTallonState(self, rewards):
     #print(self.gameWorld.getTallonLocation().y)
     x = self.gameWorld.getTallonLocation().x
     y = self.gameWorld.getTallonLocation().y
-    rewards[y, x] = 0.
-    #aisles[y].append(x)
+    rewards[y, x] = -1.
 
 #GC Get meenie state/position and add this to the aisles grid
-def getMeanieStates(self, aisles):
+def getMeanieStates(self, aisles_rows):
     #print("Meanies state:")
     for i in range(len(self.gameWorld.getMeanieLocation())):
         #print(self.gameWorld.getMeanieLocation()[i].x)
         #print(self.gameWorld.getMeanieLocation()[i].y)
         x = self.gameWorld.getMeanieLocation()[i].x
         y = self.gameWorld.getMeanieLocation()[i].y
-        aisles[y].append(x)
+        aisles_rows[y].append(x)
 
 #GC Get pit state/position and add this to the aisles grid
-def getPitsStates(self, aisles):
+def getPitsStates(self, aisles_rows):
     #print("Pit state:")
     for i in range(len(self.gameWorld.getPitsLocation())):
         #print(self.gameWorld.getMeanieLocation()[i].x)
         #print(self.gameWorld.getMeanieLocation()[i].y)
         x = self.gameWorld.getPitsLocation()[i].x
         y = self.gameWorld.getPitsLocation()[i].y
-        aisles[y].append(x)
+        aisles_rows[y].append(x)
 
 #GC Get bonus state/position and add this to the aisles grid
 def getBonusStates(self, rewards):
@@ -346,8 +345,7 @@ class Tallon():
 
             # GC prints shortest path after the q_learnign has completed
             # the shortest path is form tallons current location in the grid
-            print(get_shortest_path(self.gameWorld.getTallonLocation().x, self.gameWorld.getTallonLocation().y)) 
-
+            print(get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)) #starting at row 3, column 9
 
 
 
