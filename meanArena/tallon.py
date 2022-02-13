@@ -92,7 +92,7 @@ def gridWorld(self):
     
     # define the states of the arena so we can add the objects to the grid for the q-values
     getMeanieStates(self, aisles)
-    getTallonState(self, aisles)
+    getTallonState(self, rewards)
     getPitsStates(self, aisles)
     getBonusStates(self, rewards)
     
@@ -112,14 +112,15 @@ def gridWorld(self):
 # ================ GC end global variables ====================
 
 #GC Get tellon state/postion and add this to the aisles grid
-def getTallonState(self, aisles):
+def getTallonState(self, rewards):
     #print("Tallon state:")
     #self.gameWorld.getTallonLocation().print()
     #print(self.gameWorld.getTallonLocation().x)
     #print(self.gameWorld.getTallonLocation().y)
     x = self.gameWorld.getTallonLocation().x
     y = self.gameWorld.getTallonLocation().y
-    aisles[y].append(x)
+    rewards[y, x] = 0.
+    #aisles[y].append(x)
 
 #GC Get meenie state/position and add this to the aisles grid
 def getMeanieStates(self, aisles):
@@ -245,7 +246,7 @@ def get_shortest_path(start_row_index, start_column_index):
       #move to the next location on the path, and add the new location to the list
       current_row_index, current_column_index = get_next_location(current_row_index, current_column_index, action_index)
       shortest_path.append([current_row_index, current_column_index])
-    return shortest_path
+    return shortest_path #note returns y then x i.e., row then column - up/down then left/right
 
 
 # ---------------------- train the AI agent -------------------------
@@ -345,7 +346,8 @@ class Tallon():
             q_learning(self)
 
             # GC prints shortest path after the q_learnign has completed
-            print(get_shortest_path(5, 9)) #starting at row 5, column 9
+            # the shortest path is form tallons current location in the grid
+            print(get_shortest_path(self.gameWorld.getTallonLocation().x, self.gameWorld.getTallonLocation().y)) 
 
 
 
