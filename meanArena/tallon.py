@@ -44,11 +44,14 @@ epsilon = 0.9 #the percentage of time when we should take the best action (inste
 discount_factor = 0.9 #discount factor for future rewards
 learning_rate = 0.9 #the rate at which the AI agent should learn
 
+
+# ================ GC end global variables ====================
+
+
+
 # -------------------- define actions -------------------------
 #numeric action codes: 0 = up, 1 = right, 2 = down, 3 = left
 actions = ['up', 'right', 'down', 'left']
-
-
 
 
 def gridWorld(self):
@@ -108,8 +111,6 @@ def gridWorld(self):
         #print(row)
 
 
-
-# ================ GC end global variables ====================
 
 #GC Get tellon state/postion and add this to the aisles grid
 def getTallonState(self, rewards):
@@ -197,7 +198,6 @@ def get_starting_location():
 def is_terminal_state(current_row_index, current_column_index):
   #if the reward for this location is -1, then it is not a terminal state (i.e., it is a 'white square')
   if rewards[current_row_index, current_column_index] == -1.:
-    #print("i am in termina state")
     return False
   else:
     return True
@@ -208,7 +208,6 @@ def get_next_action(current_row_index, current_column_index, epsilon):
   #if a randomly chosen value between 0 and 1 is less than epsilon, 
   #then choose the most promising value from the Q-table for this state.
   if np.random.random() < epsilon:
-    #print("NP arg max", np.argmax(q_values[current_row_index, current_column_index]))
     return np.argmax(q_values[current_row_index, current_column_index])
   else: #choose a random action
     return np.random.randint(4)
@@ -234,6 +233,7 @@ def get_next_location(current_row_index, current_column_index, action_index):
 def get_shortest_path(start_row_index, start_column_index):
   #return immediately if this is an invalid starting location
   if is_terminal_state(start_row_index, start_column_index):
+    print("TERMINAL STATE")
     return []
   else: #if this is a 'legal' starting location
     current_row_index, current_column_index = start_row_index, start_column_index
@@ -256,13 +256,12 @@ def q_learning(self):
     for episode in range(1000):
     #get the starting location for this episode
         row_index, column_index = get_starting_location()
-
         #continue taking actions (i.e., moving) until we reach a terminal state
         #(i.e., until we reach the item packaging area or crash into an item storage location)
         while not is_terminal_state(row_index, column_index):
             #choose which action to take (i.e., where to move next)
             action_index = get_next_action(row_index, column_index, epsilon)
-
+ 
             #perform the chosen action, and transition to the next state (i.e., move to the next location)
             old_row_index, old_column_index = row_index, column_index #store the old row and column indexes
             row_index, column_index = get_next_location(row_index, column_index, action_index)
@@ -347,7 +346,8 @@ class Tallon():
 
             # GC prints shortest path after the q_learnign has completed
             # the shortest path is form tallons current location in the grid
-            print(get_shortest_path(self.gameWorld.getTallonLocation().x, self.gameWorld.getTallonLocation().y)) 
+            #print(get_shortest_path(self.gameWorld.getTallonLocation().x, self.gameWorld.getTallonLocation().y)) 
+            print(get_shortest_path(0, 0)) 
 
 
 
