@@ -1,5 +1,5 @@
-# ----------------- Start Student Details -----------------------------
-
+# ================ Student Details ======================= 
+#
 # Name:     Garry Clawson
 # ID:       18685030
 # Date:     14th Jan 2022
@@ -8,9 +8,33 @@
 # Version:  0.1.0
 # Notes:    This program implements the q_learning AI system with epsilon greedy algorithm to choose next action and encourage exploration
 # Credits:  Credits are noted throughout the code
-#           
-# ----------------- End Student Details -----------------------------
-
+#
+# Areas to improve: 0) Note: Very very occasionally (found through the testing I did), on my machine the program hangs for no obvious reason. If this happens 
+#                   please just retart the game. I have not been able to track this down as it happens so rarely. 
+# 
+#                   1) A meanie state supercedes other states as they move through the gridworld. therefdore if they 'hide' on a bonus (say the last bonus)
+#                   then the q_learning does not see any further bonuses and hangs but the main makeMove() function still sees the bonus so never transitions to
+#                   creating a new bonus. The Tallon just does not know where to go ang hangs. This could be resolved if we always add a randomBonus in
+#                   if we only have 1 actual bonus left (arena world view). It would just mean that we only have 50% chance tof trying to get that last bonus
+#
+#                   2) Because we us the current state to learn a new path to the bonus while avoiding all obsticles we do not properly account for the next state
+#                   of a meanie. There is some test script for adding a buffer around the nearest grid position to Tallon if the meanie is 2 grid places away. 
+#                   This results in the grid having fewer options to create a path and with a small grid paths are sometimes not available.
+#
+#                   3) It would be good to identify the density of the grid in someway so that we can switch from 'get bobnus' mode to survival mode
+#                   depending on the value of the remaining rewards, how far away they are (value of shortest path in steps) Vs steps we think we can get if we just kept moving.
+#
+#                   4) Because of the way the game is organised in game.py, we update Tallon, then the meanie, then we add a meanie, then we update the display. 
+#                   Because the gridWorld takes the current state straight after Tallon move (i.e. call makeMOve()), we are always one step behind the when we look at
+#                   the gridWorld in the terminal and the actual arena map displayed. However, that also impacts the game play of the q_learning and getting the shortest path. 
+#
+#                   5) Add some functionality when it sees an edge fo the gridWorld to not get boxed in (i.e. add some priority to moving EAST moving towards a WEST wall)
+#
+#                   6) .... lot of others but the above would help a lot.
+#     
+              
+# ================ Tallon.py details ======================= 
+#
 # tallon.py
 #
 # The code that defines the behaviour of Tallon. This is the place
@@ -22,14 +46,14 @@
 
 # ================= imports ========================
 
-# imports
+# Imports
 from glob import glob
 from pickle import NONE
 from re import X
 import numpy as np
 import string
 
-# original imports
+# Original imports
 import world
 import random
 import utils
@@ -38,12 +62,13 @@ from utils import Directions
 
 # ================ Global variables and parameters ====================
 
+# Define the global variables
 rewards = [NONE]
 q_values = [NONE]
 environment_rows = 0
 environment_columns = 0
 
-# define q_learning training parameters
+# Define q_learning training parameters
 epsilon = 0.9 #the percentage of time when we should take the best action (instead of a random action)
 discount_factor = 0.9 #discount factor for future rewards
 learning_rate = 0.9 #the rate at which the AI agent should lear
@@ -51,6 +76,7 @@ actions = ['up', 'right', 'down', 'left'] #numeric action codes: 0 = up, 1 = rig
 
 # ================ Required helper functions for q_learning ====================
 
+# Define the gridWorld that the q_learning will use replicate the arena and then to iterate through at each interval
 def gridWorld(self):
 
     global rewards, q_values, environment_columns, environment_rows
@@ -84,7 +110,6 @@ def gridWorld(self):
     aisles_rows[8] = []
     aisles_rows[9] = []
     
-    
     # Use the states of the arena to define the states of the grid
     getMeanieStates(self, aisles_rows)
     getTallonState(self, rewards)
@@ -114,7 +139,7 @@ def getTallonState(self, rewards):
     #print(self.gameWorld.getTallonLocation().y)
     x = self.gameWorld.getTallonLocation().x
     y = self.gameWorld.getTallonLocation().y
-    rewards[y, x] = 0. 
+    rewards[y, x] = -1. #0.
 
 #GC Get meanie state and this to the grid
 def getMeanieStates(self, aisles_rows):
@@ -201,6 +226,9 @@ def getRandomBonusState(rewards):
     current_row_index = np.random.randint(environment_rows)
     current_column_index = np.random.randint(environment_columns)
     # apply new reward somewhere in grid (I should check if its a terminal state but the aim here is to keep moving)
+    while is_terminal_state(current_row_index, current_column_index):
+      current_row_index = np.random.randint(environment_rows)
+      current_column_index = np.random.randint(environment_columns)
     rewards[current_column_index, current_row_index] = 99.
 
 # Helper function to get the states of the arena and print them to the terminal for trouble shooting
@@ -248,8 +276,8 @@ def is_terminal_state(current_row_index, current_column_index):
   #if the reward for this location is -1, then it is not a terminal state (i.e., it is an available space to traverse)
   if rewards[current_row_index, current_column_index] == -1.:
     return False
-  elif rewards[current_row_index, current_column_index] == 0.: # 0 is the state of Tallon. We only use this so we can see Tallon on the grid
-    return False
+  #elif rewards[current_row_index, current_column_index] == 0.: # 0 is the state of Tallon. We only use this so we can see Tallon on the grid
+  #  return False
   else:
     return True
 
@@ -397,8 +425,8 @@ class Tallon():
         # Resuse the above code functions to enable the movements (yep, should follow the DRY principle here)
         # This will now continue trying the build up clock points until Tallon is either captured or falls into a pit (somehow)
         else: 
-          print(" ---- NO LOOT LEFT SO JUST AVOID MEANIES & PITS: ----")
-          printGameState(self)
+          print("\n ---- NO LOOT LEFT SO JUST AVOID MEANIES & PITS: ----")
+          #printGameState(self)
           gridWorld(self)
           q_learning(self)
 
