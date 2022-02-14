@@ -17,7 +17,7 @@ https://user-images.githubusercontent.com/44243266/153961130-d83f82ba-c9f0-4fba-
 
 ### Evading the Meanies once all bonuses have been collected
 
-https://user-images.githubusercontent.com/44243266/153961987-3deba5d9-511e-4ab2-8c93-884753b86137.mov
+https://user-images.githubusercontent.com/44243266/153962153-b9340ad9-30e7-4fd3-a935-06a1b38b0755.mov
 
 ### Meanies covering the last bonus so my Q-Learning has no where to plot a path to :(
 
