@@ -120,9 +120,9 @@ def getTallonState(self, rewards):
     #print(self.gameWorld.getTallonLocation().y)
     x = self.gameWorld.getTallonLocation().x
     y = self.gameWorld.getTallonLocation().y
-    rewards[y, x] = -1.
+    rewards[y, x] = 0. #-1.
 
-#GC Get meenie state/position and add this to the aisles grid
+#GC Get meanie state/position and add this to the aisles grid
 def getMeanieStates(self, aisles_rows):
     #print("Meanies state:")
     for i in range(len(self.gameWorld.getMeanieLocation())):
@@ -131,6 +131,56 @@ def getMeanieStates(self, aisles_rows):
         x = self.gameWorld.getMeanieLocation()[i].x
         y = self.gameWorld.getMeanieLocation()[i].y
         aisles_rows[y].append(x)
+
+        #print("y and x position of meanie", y,x)
+
+        # check to see if any position iof a meanie is adjecent to tallon. if so then mark it as cannot be traversed i.e. -100
+        #
+        #     0 0 0
+        #  T  0 x 0
+        #     0 0 0
+        #
+        # change area that the q_learning process sees as no-go areas (i.e., very low reward -100):
+        #
+        #     0 0 0               0 0 0 
+        #  T  x x 0     or        x x 0
+        #     0 0 0           T   x 0 0
+        #
+        
+        '''
+        # check directly adjecent araes they could move into
+        if x == self.gameWorld.getTallonLocation().x + 2: #i.e. the meanie position is 2 to the EAST than tallon
+            aisles_rows[y].append(x + 1)
+            print("enemy close - east")
+        if x == self.gameWorld.getTallonLocation().x - 2: #i.e. the meanie position is 2 to the WEST than tallon
+            aisles_rows[y].append(x - 1)
+            print("enemy close - west")
+        if y == self.gameWorld.getTallonLocation().y + 2: #i.e. the meanie position is 2 to the NORTH than tallon
+            aisles_rows[y + 1].append(x)
+            print("enemy close - north")
+        if y == self.gameWorld.getTallonLocation().y - 2: #i.e. the meanie position is 2 to the SOUTH than tallon
+            aisles_rows[y - 1].append(x)
+            print("enemy close - south")
+
+        # check diagnols of enemy for areas they could move into
+        if x == self.gameWorld.getTallonLocation().x + 1 and y == self.gameWorld.getTallonLocation().y + 1: #i.e. the meanie position is 1 to the NORTH EAST than tallon
+            aisles_rows[y + 1].append(x + 1)
+            print("enemy close - NE")
+        if x == self.gameWorld.getTallonLocation().x - 1 and y == self.gameWorld.getTallonLocation().y + 1: #i.e. the meanie position is 1 to the NORTH WEST than tallon
+            aisles_rows[y + 1].append(x - 1)
+            print("enemy close - NW")
+        if x == self.gameWorld.getTallonLocation().x + 1 and y == self.gameWorld.getTallonLocation().y - 1: #i.e. the meanie position is 1 to the SOUTH EAST than tallon
+            aisles_rows[y - 1].append(x + 1)
+            print("enemy close - SE")
+        if x == self.gameWorld.getTallonLocation().x - 1 and y == self.gameWorld.getTallonLocation().y - 1: #i.e. the meanie position is 1 to the SOUTH WEST than tallon
+            aisles_rows[y - 1].append(x - 1)
+            print("enemy close - SW")
+        '''
+
+
+        # add boundary around meanies so that Tallon avoids their potential next step
+        #aisles_rows[y].append(x)
+
 
 #GC Get pit state/position and add this to the aisles grid
 def getPitsStates(self, aisles_rows):
@@ -171,8 +221,8 @@ def printGameState(self):
     for i in range(len(self.gameWorld.getPitsLocation())):
         self.gameWorld.getPitsLocation()[i].print()
 
-    #print("Clock:")
-    #print(self.gameWorld.getClock())
+    print("Clock:")
+    print(self.gameWorld.getClock())
 
     #print("Score:")
     #print(self.gameWorld.getScore())
@@ -193,10 +243,25 @@ def get_starting_location():
     current_column_index = np.random.randint(environment_columns)
   return current_row_index, current_column_index
 
+#define a function that will choose a random, non-terminal starting location
+def last_for_as_long_as_posisble():
+  #get a random row and column index
+  current_row_index = np.random.randint(environment_rows)
+  current_column_index = np.random.randint(environment_columns)
+  #continue choosing random row and column indexes until a non-terminal state is identified
+  #(i.e., until the chosen state is a 'white square').
+  while is_terminal_state(current_row_index, current_column_index):
+    current_row_index = np.random.randint(environment_rows)
+    current_column_index = np.random.randint(environment_columns)
+    rewards[current_column_index, current_row_index] = 99.
+  #return current_row_index, current_column_index
+
 # ----------------- define a function that determines if the specified location is a terminal state -------------------------
 def is_terminal_state(current_row_index, current_column_index):
   #if the reward for this location is -1, then it is not a terminal state (i.e., it is a 'white square')
   if rewards[current_row_index, current_column_index] == -1.:
+    return False
+  elif rewards[current_row_index, current_column_index] == 0.: #0 is the state of Tallon so we can see him in the grid
     return False
   else:
     return True
@@ -274,6 +339,15 @@ def q_learning(self):
             new_q_value = old_q_value + (learning_rate * temporal_difference)
             q_values[old_row_index, old_column_index, action_index] = new_q_value
 
+
+            #print the coberging reuslts for the updated q_value
+            #this will be sued dfor anlaysing converegnce times (i.e. is 1000 iterations enough)
+            #for row in q_values:
+            #    print(row)
+
+
+
+
     print('Training complete!')
 
 
@@ -320,8 +394,8 @@ class Tallon():
         if len(allBonuses) > 0:
 
             #GC print game state
-            print("GAME STATE:")
-            printGameState(self)
+            print(" ---- GAME STATE: ----")
+            #printGameState(self)
 
             
 
@@ -345,11 +419,48 @@ class Tallon():
 
             # GC prints shortest path after the q_learnign has completed
             # the shortest path is form tallons current location in the grid
-            print(get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)) #starting at row 3, column 9
+            getShortestPath = get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)
+            print("Shortest path (row, column): ", get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)) 
+
+            # TODO create function that compares current position (1st array item) and next move and moves that way using return.Directions.EAST etc
+
+            #print 2nd item in array
+
+            currentPosition = getShortestPath[0]
+            #print("current position: ", currentPosition)
+            nextPosition = getShortestPath[1]
+            #print("next position: ", nextPosition)
+
+            #positions for y and x
+            #print("current position y: ", currentPosition[0])
+            #print("current position x: ", currentPosition[1])
+            #print("next position y: ", nextPosition[0])
+            #print("next position x: ", nextPosition[1])
+
+            # GC East is left in the map and should be to avoid an enemy
+            # GC tallon is updated through ther world.py file and updatetallon() function from game.py
+            # If not at the same x coordinate, reduce the difference
+            # The next position is only different by 1 value as it can only move in 1 direction
+            # so we check to see which position that is and then move in that direction using directions.EAST etc
+            # since were are just using the shortestPath to get out positions these co-ordinates are in y, x (as in numpy array row then column)
+            # the Tallons position is in x, y. This is whey when we get the shortest path we specify y then x to get our starting point iin the righty position
+
+            
+            # The positions here are defined on the grid with 'further' menaing to the down and right
+            if nextPosition[1] > currentPosition[1]: #i.e. the next position is further to the EAST than current
+                return Directions.EAST 
+            if nextPosition[1] < currentPosition[1]: #i.e. the next position is further to the WEST than current
+                return Directions.WEST
+            if nextPosition[0] < currentPosition[0]: #i.e. the next position is further to the NORTH than current
+                return Directions.NORTH
+            if nextPosition[0] > currentPosition[0]: #i.e. the next position is further to the SOUTH than current
+                return Directions.SOUTH
+            
+            
 
 
 
-
+            '''
             # GC East is left in the map and should be to avoid an enemy
             # GC tallon is updated through ther world.py file and updatetallon() function from game.py
             # If not at the same x coordinate, reduce the difference
@@ -362,9 +473,11 @@ class Tallon():
                 return Directions.NORTH
             if nextBonus.y > myPosition.y:
                 return Directions.SOUTH
-
+            '''
         
 
         # if there are no more bonuses, Tallon doesn't move
         # GC The bonuses are made up of an array list - check how this builds up?
 
+        if len(allBonuses) == 0:  
+          last_for_as_long_as_posisble()

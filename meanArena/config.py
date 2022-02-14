@@ -12,7 +12,7 @@ worldLength = 10
 worldBreadth = 10
 
 # Features
-numberOfMeanies = 1 # How many we start with
+numberOfMeanies = 0 # How many we start with
 numberOfPits = 3
 numberOfBonuses = 3
 
@@ -56,4 +56,4 @@ meanieInterval = 5
 #
 # If useImage is True, then we use images for Tallon, Meanies and
 # Bonuses. If it is False, then we use simple colored objects.
-useImage = False #True
+useImage =  False #True
