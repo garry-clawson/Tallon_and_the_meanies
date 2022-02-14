@@ -12,8 +12,8 @@
 # Areas to improve: 0) Note: Very very occasionally (found through the testing I did), on my machine the program hangs for no obvious reason. If this happens 
 #                   please just retart the game. I have not been able to track this down as it happens so rarely. 
 # 
-#                   1) A meanie state supercedes other states as they move through the gridworld. therefdore if they 'hide' on a bonus (say the last bonus)
-#                   then the q_learning does not see any further bonuses and hangs but the main makeMove() function still sees the bonus so never transitions to
+#                   1) A meanie state supercedes other states as they move through the gridworld. Therefdore can step and 'hide' on a bonus (say the last bonus) or pit
+#                   then the q_learning does not see any further bonuses and hangs. But the main makeMove() function still sees the bonus so never transitions to
 #                   creating a new bonus. The Tallon just does not know where to go ang hangs. This could be resolved if we always add a randomBonus in
 #                   if we only have 1 actual bonus left (arena world view). It would just mean that we only have 50% chance tof trying to get that last bonus
 #
@@ -28,9 +28,14 @@
 #                   Because the gridWorld takes the current state straight after Tallon move (i.e. call makeMOve()), we are always one step behind the when we look at
 #                   the gridWorld in the terminal and the actual arena map displayed. However, that also impacts the game play of the q_learning and getting the shortest path. 
 #
-#                   5) Add some functionality when it sees an edge fo the gridWorld to not get boxed in (i.e. add some priority to moving EAST moving towards a WEST wall)
+#                   5) Add some functionality when it sees an edge of the gridWorld to not get boxed in (i.e. add some priority to moving EAST moving towards a WEST wall)
 #
-#                   6) .... lot of others but the above would help a lot.
+#                   6) If Tallon is boxed in by meanies (say 3 of them against a wall/edge), then because we cannot create a shortest path the program will hang. 
+#                   A resolution to this would be to just randomly move and die. But I kind of like the fact that in this scenario Tallon will never die. Like a checkmate
+#                   but the player refusing to resign their king. The time just keeps going. Even though we don't accrue points, Tallon in this state, is alive and like 
+#                   Schrödinger's cat, somehow 'surviving'. so yes, I am stetching here the assignment objectives, but just for fun!!
+#
+#                   7) .... lot of others but the above would help a lot.
 #     
               
 # ================ Tallon.py details ======================= 
@@ -320,10 +325,14 @@ def get_shortest_path(start_row_index, start_column_index):
 
 
 # Define a function that will train the AI agent
-# INSPIRED BY >> 
+# INSPIRED BY >>  https://www.geeksforgeeks.org/q-learning-in-python/ 
+#                 & https://www.learndatasci.com/tutorials/reinforcement-q-learning-scratch-python-openai-gym/
+#                 & https://www.analyticsvidhya.com/blog/2021/04/q-learning-algorithm-with-step-by-step-implementation-using-python/
+#                 & https://towardsdatascience.com/q-learning-algorithm-from-explanation-to-implementation-cdbeda2ea187
+
 def q_learning(self):
 
-    # Run through 1000 training iterations - taken form trail and error of convergence
+    # Run through 1000 training iterations - taken from trail and error when reveiwing convergence
     for episode in range(1000):
     # Fetch the starting location for this iteration
         row_index, column_index = get_starting_location()
@@ -346,17 +355,15 @@ def q_learning(self):
             new_q_value = old_q_value + (learning_rate * temporal_difference)
             q_values[old_row_index, old_column_index, action_index] = new_q_value
 
-            #print the coberging results for the updated q_value
-            #this will be used for analysing convergence times (i.e. is 1000 iterations enough)
+            # Print the converging results for the updated q_value
+            # this will be used for analysing convergence times (i.e. is 1000 iterations enough)
             #for row in q_values:
             #    print(row)
-
-    print('Training complete!')
 
 
 # ================ main tallon class ====================
 
-# Define the Talon class as per requirements ot run the program from a vanilla project using just a tallon.py file
+# Define the Talon class as per requirements to run the program from a vanilla project using just a tallon.py file
 class Tallon():
 
     def __init__(self, arena):
