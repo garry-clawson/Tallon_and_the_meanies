@@ -2,13 +2,15 @@
 
 # Name:     Garry Clawson
 # ID:       18685030
-# Date:     29th Jan 2022
+# Date:     14th Jan 2022
 # Module:   CMP9132M
 # Title:    AAI Assignment 2
 # Version:  0.1.0
-
+# Notes:    This program implements the q_learning AI system with epsilon greedy algorithm to choose next action and encourage exploration
+# Credits:  Credits are noted throughout the code
+#           
 # ----------------- End Student Details -----------------------------
-#
+
 # tallon.py
 #
 # The code that defines the behaviour of Tallon. This is the place
@@ -18,70 +20,59 @@
 # Written by: Simon Parsons
 # Last Modified: 12/01/22
 
+# ================= imports ========================
 
-# GC imports
+# imports
 from glob import glob
 from pickle import NONE
 from re import X
 import numpy as np
 import string
 
-# Original imports
+# original imports
 import world
 import random
 import utils
 from utils import Directions
 
-# ================= GC global variables ========================
+
+# ================ Global variables and parameters ====================
 
 rewards = [NONE]
 q_values = [NONE]
 environment_rows = 0
 environment_columns = 0
 
-#define q_learning training parameters
+# define q_learning training parameters
 epsilon = 0.9 #the percentage of time when we should take the best action (instead of a random action)
 discount_factor = 0.9 #discount factor for future rewards
-learning_rate = 0.9 #the rate at which the AI agent should learn
+learning_rate = 0.9 #the rate at which the AI agent should lear
+actions = ['up', 'right', 'down', 'left'] #numeric action codes: 0 = up, 1 = right, 2 = down, 3 = left
 
-
-# ================ GC end global variables ====================
-
-
-
-# -------------------- define actions -------------------------
-#numeric action codes: 0 = up, 1 = right, 2 = down, 3 = left
-actions = ['up', 'right', 'down', 'left']
-
+# ================ Required helper functions for q_learning ====================
 
 def gridWorld(self):
 
     global rewards, q_values, environment_columns, environment_rows
 
-    # ------------------ define the shape of the environment (i.e., its states) -------------------------
-    environment_rows = self.gameWorld.maxY + 1# direction of a row is > top to bottom
-    environment_columns = self.gameWorld.maxX + 1# direction of a colum is > left to right
+    # define the shape and size of the environment (i.e., its states) 
+    environment_rows = self.gameWorld.maxY + 1 # direction of a row is > top to bottom
+    environment_columns = self.gameWorld.maxX + 1 # direction of a colum is > left to right
 
-    #Create a 3D numpy array to hold the current Q-values for each state and action pair: Q(s, a) 
-    #The array contains 11 rows and 11 columns (to match the shape of the environment), as well as a third "action" dimension.
-    #The "action" dimension consists of 4 layers that will allow us to keep track of the Q-values for each possible action in
-    #each state (see next cell for a description of possible actions). 
-    #The value of each (state, action) pair is initialized to 0.
+    # Create a 3D numpy array to hold the current q_values for each state and action pair: Q(s, a) 
+    # The array is of variable size set by utils.py (to match the shape of the environment), and a third "action" dimension.
+    # The "action" dimension consists of 4 layers that will allow us to keep track of the q_values for each possible action in each state
+    # The value of each (state, action) pair is initialized to 0.
     q_values = np.zeros((environment_rows, environment_columns, 4))
 
-
-    # -------------------- Create a 2D numpy array to hold the rewards for each state -------------------------
-    #The array contains 10 rows and 10 columns (to match the shape of the environment), and each value is initialized to -100.
+    # Create a 2D numpy array to hold the rewards for each state. The rewards include all meanies, pits and bonuses
+    # Each value is initialized to reward of -1.  
     rewards = np.full((environment_rows, environment_columns), -1.)
 
-    #rewards[0, 5] = 100. #set the reward for the packaging area (i.e., the goal) to 100
-
-    #define aisle locations (i.e., white squares) for rows 1 through 9
+    # Define locations (i.e., places that the agent can traverse]) for rows and columns of grid in dictionary
     aisles_rows = {} #store locations in a dictionary
 
-    # GC Create blank posistions for the grid to initialsie
-    # we will fill them up by getting the states of the meanies/tollen/pist and bonusses
-
+    # Initialise the dictionary so we can later add states (i.e.m of meanies, pits etc)    
     aisles_rows[0] = []
     aisles_rows[1] = []
     aisles_rows[2] = []
@@ -93,26 +84,29 @@ def gridWorld(self):
     aisles_rows[8] = []
     aisles_rows[9] = []
     
-    # define the states of the arena so we can add the objects to the grid for the q-values
+    
+    # Use the states of the arena to define the states of the grid
     getMeanieStates(self, aisles_rows)
     getTallonState(self, rewards)
     getPitsStates(self, aisles_rows)
     getBonusStates(self, rewards)
     
-    #set the rewards for all aisle locations (i.e., all non pit or meanie positions)
+    # If there are no more bonuses then place a random bonus in the grid - this will keep Tollen moving around after all bonuses are collected
+    if 99 not in rewards: 
+      print('random bonus added')
+      getRandomBonusState(rewards)
+    
+    #set the rewards for all grid locations at a reward value of -100 (i.e., all pit or meanie positions)
     for row_index in range(0, 10):
         for column_index in aisles_rows[row_index]:
             rewards[row_index, column_index] = -100.
 
     #print rewards matrix in terminal so we can see where the meanies and pits etc are for our q_learning
     for row in rewards:
-        format_string = "{:>6}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}"
+        format_string = "{:>6}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}" #just used for easy terminal spacing
         print(format_string.format(*row))
-        #print(row)
 
-
-
-#GC Get tellon state/postion and add this to the aisles grid
+# Get Tallon state and add this to the grid
 def getTallonState(self, rewards):
     #print("Tallon state:")
     #self.gameWorld.getTallonLocation().print()
@@ -120,9 +114,9 @@ def getTallonState(self, rewards):
     #print(self.gameWorld.getTallonLocation().y)
     x = self.gameWorld.getTallonLocation().x
     y = self.gameWorld.getTallonLocation().y
-    rewards[y, x] = 0. #-1.
+    rewards[y, x] = 0. 
 
-#GC Get meanie state/position and add this to the aisles grid
+#GC Get meanie state and this to the grid
 def getMeanieStates(self, aisles_rows):
     #print("Meanies state:")
     for i in range(len(self.gameWorld.getMeanieLocation())):
@@ -132,9 +126,13 @@ def getMeanieStates(self, aisles_rows):
         y = self.gameWorld.getMeanieLocation()[i].y
         aisles_rows[y].append(x)
 
-        #print("y and x position of meanie", y,x)
-
-        # check to see if any position iof a meanie is adjecent to tallon. if so then mark it as cannot be traversed i.e. -100
+        '''
+        # The q_learning will only plot a path avoiding obsticles (i.e. rewards of -100) using the current available view
+        # This does not allow for future views or possible positions when moving - 1 x state transition at a time
+        # A possible way to resolve is by adding a buffer to the meanies size of 1 x extra grid position around the meanie
+        # This reduces the size of the board that can be played and also the available shortest path to a bonus
+        #
+        # check to see if any position iof a meanie is adjacent to Tallon. if so then mark it as cannot be traversed i.e. -100
         #
         #     0 0 0
         #  T  0 x 0
@@ -147,22 +145,21 @@ def getMeanieStates(self, aisles_rows):
         #     0 0 0           T   x 0 0
         #
         
-        '''
-        # check directly adjecent araes they could move into
-        if x == self.gameWorld.getTallonLocation().x + 2: #i.e. the meanie position is 2 to the EAST than tallon
+        # check directly adjacent areas the meanies could move into >> protect 1 x move ahead but reduces potential paths on the grid
+        if x == self.gameWorld.getTallonLocation().x + 2: #i.e. the meanie position is 2 to the EAST than Tallon
             aisles_rows[y].append(x + 1)
             print("enemy close - east")
-        if x == self.gameWorld.getTallonLocation().x - 2: #i.e. the meanie position is 2 to the WEST than tallon
+        if x == self.gameWorld.getTallonLocation().x - 2: #i.e. the meanie position is 2 to the WEST than Tallon
             aisles_rows[y].append(x - 1)
             print("enemy close - west")
-        if y == self.gameWorld.getTallonLocation().y + 2: #i.e. the meanie position is 2 to the NORTH than tallon
+        if y == self.gameWorld.getTallonLocation().y + 2: #i.e. the meanie position is 2 to the NORTH than Tallon
             aisles_rows[y + 1].append(x)
             print("enemy close - north")
-        if y == self.gameWorld.getTallonLocation().y - 2: #i.e. the meanie position is 2 to the SOUTH than tallon
+        if y == self.gameWorld.getTallonLocation().y - 2: #i.e. the meanie position is 2 to the SOUTH than Tallon
             aisles_rows[y - 1].append(x)
             print("enemy close - south")
 
-        # check diagnols of enemy for areas they could move into
+        # check diagonal of enemy for areas they could move into - add these ot the grid
         if x == self.gameWorld.getTallonLocation().x + 1 and y == self.gameWorld.getTallonLocation().y + 1: #i.e. the meanie position is 1 to the NORTH EAST than tallon
             aisles_rows[y + 1].append(x + 1)
             print("enemy close - NE")
@@ -178,11 +175,8 @@ def getMeanieStates(self, aisles_rows):
         '''
 
 
-        # add boundary around meanies so that Tallon avoids their potential next step
-        #aisles_rows[y].append(x)
 
-
-#GC Get pit state/position and add this to the aisles grid
+# Get pit state and add this to the grid
 def getPitsStates(self, aisles_rows):
     #print("Pit state:")
     for i in range(len(self.gameWorld.getPitsLocation())):
@@ -192,7 +186,7 @@ def getPitsStates(self, aisles_rows):
         y = self.gameWorld.getPitsLocation()[i].y
         aisles_rows[y].append(x)
 
-#GC Get bonus state/position and add this to the aisles grid
+#Get bonus state and add this to the grid
 def getBonusStates(self, rewards):
     #print("Bonus state:")
     for i in range(len(self.gameWorld.getBonusLocation())):
@@ -200,11 +194,18 @@ def getBonusStates(self, rewards):
         #print(self.gameWorld.getMeanieLocation()[i].y)
         x = self.gameWorld.getBonusLocation()[i].x
         y = self.gameWorld.getBonusLocation()[i].y
-        rewards[y, x] = 99.
+        rewards[y, x] = 99. # A bonus is worth 99 (99 is also an easy number to see on the terminal grid!) so that it is rewarded for traversing to it
+      
+# Define a function that will choose a random, non-terminal point for a bonus if no further bonuses are available
+def getRandomBonusState(rewards):
+    #get a random row and column index
+    current_row_index = np.random.randint(environment_rows)
+    current_column_index = np.random.randint(environment_columns)
+    # apply new reward somewhere in grid (I should check if its a terminal state but the aim here is to keep moving)
+    rewards[current_column_index, current_row_index] = 99.
 
-# GC Get current state of arena so we can add the objects to the grid for the q-values
-# Credit to S. Parsons >> below was taken from utils.py
-
+# Helper function to get the states of the arena and print them to the terminal for trouble shooting
+# CREDIT >> Credit to S. Parsons. Below was taken from utils.py
 def printGameState(self):
     print("Meanies:")
     for i in range(len(self.gameWorld.getMeanieLocation())):
@@ -224,60 +225,48 @@ def printGameState(self):
     print("Clock:")
     print(self.gameWorld.getClock())
 
-    #print("Score:")
-    #print(self.gameWorld.getScore())
+    print("Score:")
+    print(self.gameWorld.getScore())
 
     print("")
 
 
 
-#define a function that will choose a random, non-terminal starting location
+# Define a function that will choose a random, non-terminal starting location for each q_learbing iteration
 def get_starting_location():
   #get a random row and column index
   current_row_index = np.random.randint(environment_rows)
   current_column_index = np.random.randint(environment_columns)
   #continue choosing random row and column indexes until a non-terminal state is identified
-  #(i.e., until the chosen state is a 'white square').
+  #(i.e., until the chosen state is a of value -1 (any other value such as -100, indicates it is a meanie or pit)).
   while is_terminal_state(current_row_index, current_column_index):
     current_row_index = np.random.randint(environment_rows)
     current_column_index = np.random.randint(environment_columns)
   return current_row_index, current_column_index
 
-#define a function that will choose a random, non-terminal point for a bonus
-def random_bonus_position():
-  #get a random row and column index
-  current_row_index = np.random.randint(environment_rows)
-  current_column_index = np.random.randint(environment_columns)
-  #continue choosing random row and column indexes until a non-terminal state is identified
-  #(i.e., until the chosen state is a 'white square').
-  while is_terminal_state(current_row_index, current_column_index):
-    current_row_index = np.random.randint(environment_rows)
-    current_column_index = np.random.randint(environment_columns)
-  rewards[current_column_index, current_row_index] = 99.
-  #return current_row_index, current_column_index
 
-# ----------------- define a function that determines if the specified location is a terminal state -------------------------
+# Define a function that determines if the specified location is a terminal state (i.e. has a reward of -100 and is a meanie etc)
 def is_terminal_state(current_row_index, current_column_index):
-  #if the reward for this location is -1, then it is not a terminal state (i.e., it is a 'white square')
+  #if the reward for this location is -1, then it is not a terminal state (i.e., it is an available space to traverse)
   if rewards[current_row_index, current_column_index] == -1.:
     return False
-  elif rewards[current_row_index, current_column_index] == 0.: #0 is the state of Tallon so we can see him in the grid
+  elif rewards[current_row_index, current_column_index] == 0.: # 0 is the state of Tallon. We only use this so we can see Tallon on the grid
     return False
   else:
     return True
 
 
-#define an epsilon greedy algorithm that will choose which action to take next (i.e., where to move next)
+# Define an epsilon greedy algorithm that will choose which action to take next (i.e., where to move next in N/S/E/W)
 def get_next_action(current_row_index, current_column_index, epsilon):
-  #if a randomly chosen value between 0 and 1 is less than epsilon, 
-  #then choose the most promising value from the Q-table for this state.
+  # if a randomly chosen value between 0 and 1 is less than epsilon, 
+  # then choose the most promising value from the q_table for this state. Epsilon is set at 0.9.
   if np.random.random() < epsilon:
     return np.argmax(q_values[current_row_index, current_column_index])
-  else: #choose a random action
+  else: # choose a random action. This promotes exploration. 
     return np.random.randint(4)
 
 
-#define a function that will get the next location based on the chosen action
+# Define a function that will get the next location based on the chosen action of N/S/E/W
 def get_next_location(current_row_index, current_column_index, action_index):
   new_row_index = current_row_index
   new_column_index = current_column_index
@@ -292,65 +281,63 @@ def get_next_location(current_row_index, current_column_index, action_index):
   return new_row_index, new_column_index
 
 
-#Define a function that will get the shortest path between any location within the warehouse that 
-#the robot is allowed to travel and the item packaging location.
+# Define a function that will get the shortest path between any location within the grid that 
+# Tallon is allowed to travel and the next bonus location.
 def get_shortest_path(start_row_index, start_column_index):
-  #return immediately if this is an invalid starting location
+  # Return empty array if this is an invalid starting location
   if is_terminal_state(start_row_index, start_column_index):
     print("TERMINAL STATE")
     return []
-  else: #if this is a 'legal' starting location
+  else: # If this is an available starting location
     current_row_index, current_column_index = start_row_index, start_column_index
     shortest_path = []
     shortest_path.append([current_row_index, current_column_index])
-    #continue moving along the path until we reach the goal (i.e., the item packaging location)
+    # Continue moving along the path until we reach the bonus
     while not is_terminal_state(current_row_index, current_column_index):
-      #get the best action to take
+      # Retrieve the best next action to take
       action_index = get_next_action(current_row_index, current_column_index, 1.)
-      #move to the next location on the path, and add the new location to the list
+      # Move to the next location on the path and append the new location to the list
       current_row_index, current_column_index = get_next_location(current_row_index, current_column_index, action_index)
       shortest_path.append([current_row_index, current_column_index])
-    return shortest_path #note returns y then x i.e., row then column - up/down then left/right
+    return shortest_path 
 
 
-# ---------------------- train the AI agent -------------------------
+# Define a function that will train the AI agent
+# INSPIRED BY >> 
 def q_learning(self):
 
-    #run through 1000 training episodes
+    # Run through 1000 training iterations - taken form trail and error of convergence
     for episode in range(1000):
-    #get the starting location for this episode
+    # Fetch the starting location for this iteration
         row_index, column_index = get_starting_location()
-        #continue taking actions (i.e., moving) until we reach a terminal state
-        #(i.e., until we reach the item packaging area or crash into an item storage location)
+        # continue taking actions (i.e., traversing the grid) until we reach a terminal state
+        # (i.e. until we reach the bonus or crash into an meanie or pit)
         while not is_terminal_state(row_index, column_index):
-            #choose which action to take (i.e., where to move next)
+            # Get next action to take (i.e. where to move next)
             action_index = get_next_action(row_index, column_index, epsilon)
  
-            #perform the chosen action, and transition to the next state (i.e., move to the next location)
+            # Complete the chosen action, and transition to the next state (i.e. move to the next location)
             old_row_index, old_column_index = row_index, column_index #store the old row and column indexes
             row_index, column_index = get_next_location(row_index, column_index, action_index)
             
-            #receive the reward for moving to the new state, and calculate the temporal difference
+            # Receive the reward for moving to the new state and calculate the temporal difference (TD)
             reward = rewards[row_index, column_index]
             old_q_value = q_values[old_row_index, old_column_index, action_index]
             temporal_difference = reward + (discount_factor * np.max(q_values[row_index, column_index])) - old_q_value
 
-            #update the Q-value for the previous state and action pair
+            # Update the q_value for the previous state and action pair
             new_q_value = old_q_value + (learning_rate * temporal_difference)
             q_values[old_row_index, old_column_index, action_index] = new_q_value
 
-
-            #print the coberging reuslts for the updated q_value
-            #this will be sued dfor anlaysing converegnce times (i.e. is 1000 iterations enough)
+            #print the coberging results for the updated q_value
+            #this will be used for analysing convergence times (i.e. is 1000 iterations enough)
             #for row in q_values:
             #    print(row)
-
-
-
 
     print('Training complete!')
 
 
+# Define the Talon class as per requirements ot run the program from a vanilla project using just a tallon.py file
 class Tallon():
 
     def __init__(self, arena):
@@ -385,11 +372,6 @@ class Tallon():
 
         allBonuses = self.gameWorld.getBonusLocation()
 
-        # if there are still bonuses, move towards the next one. << GC  one position in the grid at a time
-        if len(allBonuses) > 0:
-            nextBonus = allBonuses[0] 
-            myPosition = self.gameWorld.getTallonLocation()
-
         # if there are still bonuses, move towards the next one. << GC does this include the 0.95 probablity aspect?
         if len(allBonuses) > 0:
 
@@ -397,13 +379,6 @@ class Tallon():
             print(" ---- GAME STATE: ----")
             #printGameState(self)
 
-            
-
-            nextBonus = allBonuses[0]
-
-            #define a function that will choose a random, non-terminal starting location
-            myPosition = self.gameWorld.getTallonLocation()
-            
             # GC how to print an object https://www.delftstack.com/howto/python/print-object-python/ 
             #myPosition.print()
 
@@ -481,5 +456,26 @@ class Tallon():
         # GC The bonuses are made up of an array list - check how this builds up?
 
         # If no bonusses are left then randomly create one to act as somewhere to move
-        if len(allBonuses) == 0:  
-            random_bonus_position()
+        else: 
+          print(" ---- NO LOOT SO JUST OVOID MEANIES: ----")
+          printGameState(self)
+          gridWorld(self)
+          q_learning(self)
+
+          getShortestPath = get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)
+          print("Shortest path (row, column): ", get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)) 
+
+          currentPosition = getShortestPath[0]
+
+          nextPosition = getShortestPath[1]
+
+          # Inspired by S. Parsons move code commented aout below
+          if nextPosition[1] > currentPosition[1]: #i.e. the next position is further to the EAST than current
+              return Directions.EAST 
+          if nextPosition[1] < currentPosition[1]: #i.e. the next position is further to the WEST than current
+              return Directions.WEST
+          if nextPosition[0] < currentPosition[0]: #i.e. the next position is further to the NORTH than current
+              return Directions.NORTH
+          if nextPosition[0] > currentPosition[0]: #i.e. the next position is further to the SOUTH than current
+              return Directions.SOUTH
+            
