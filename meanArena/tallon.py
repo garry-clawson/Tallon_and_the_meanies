@@ -144,6 +144,7 @@ def getMeanieStates(self, aisles_rows):
         #  T  x x 0     or        x x 0
         #     0 0 0           T   x 0 0
         #
+        # Another option could also be to give the meanies a really bad reward (say -500), so really promote avoiding them
         
         # check directly adjacent areas the meanies could move into >> protect 1 x move ahead but reduces potential paths on the grid
         if x == self.gameWorld.getTallonLocation().x + 2: #i.e. the meanie position is 2 to the EAST than Tallon
@@ -173,8 +174,6 @@ def getMeanieStates(self, aisles_rows):
             aisles_rows[y - 1].append(x - 1)
             print("enemy close - SW")
         '''
-
-
 
 # Get pit state and add this to the grid
 def getPitsStates(self, aisles_rows):
@@ -229,7 +228,6 @@ def printGameState(self):
     print(self.gameWorld.getScore())
 
     print("")
-
 
 
 # Define a function that will choose a random, non-terminal starting location for each q_learbing iteration
@@ -335,7 +333,9 @@ def q_learning(self):
             #    print(row)
 
     print('Training complete!')
-S
+
+
+# ================ main tallon class ====================
 
 # Define the Talon class as per requirements ot run the program from a vanilla project using just a tallon.py file
 class Tallon():
@@ -349,15 +349,12 @@ class Tallon():
         self.moves = [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]
         
     def makeMove(self):
-        # This is the function you need to define
 
-        # For now we have a placeholder, which always moves Tallon directly towards any existing bonuses
-        # It ignores Meanies and pits.
-        
         # Get the location of the Bonuses.
         allBonuses = self.gameWorld.getBonusLocation()
 
-        # if there are still bonuses move towards the next one. If not then create a bonus in the q_learning grid so the game keeps playing
+        # Main game program which calls the functional requirements for the q_learning AI
+        # if there are still bonuses move towards the next one. Else, create a new bonus in the q_learning grid so the game keeps playing
         if len(allBonuses) > 0:
 
             # Print start of game state header and also game state so we know were all the grid participants are
