@@ -147,7 +147,7 @@ def getMeanieStates(self, grid_rows):
         y = self.gameWorld.getMeanieLocation()[i].y
         grid_rows[y].append(x)
 
-        '''
+        
         # The q_learning will only plot a path avoiding obsticles (i.e. rewards of -100) using the current available view
         # This does not allow for future views or possible positions when moving - 1 x state transition at a time
         # A possible way to resolve is by adding a buffer to the meanies size of 1 x extra grid position around the meanie
@@ -169,32 +169,32 @@ def getMeanieStates(self, grid_rows):
         
         # check directly adjacent areas the meanies could move into >> protect 1 x move ahead but reduces potential paths on the grid
         if x == self.gameWorld.getTallonLocation().x + 2: #i.e. the meanie position is 2 to the EAST than Tallon
-            aisles_rows[y].append(x + 1)
+            grid_rows[y].append(x + 1)
             print("enemy close - east")
         if x == self.gameWorld.getTallonLocation().x - 2: #i.e. the meanie position is 2 to the WEST than Tallon
-            aisles_rows[y].append(x - 1)
+            grid_rows[y].append(x - 1)
             print("enemy close - west")
         if y == self.gameWorld.getTallonLocation().y + 2: #i.e. the meanie position is 2 to the NORTH than Tallon
-            aisles_rows[y + 1].append(x)
+            grid_rows[y + 1].append(x)
             print("enemy close - north")
         if y == self.gameWorld.getTallonLocation().y - 2: #i.e. the meanie position is 2 to the SOUTH than Tallon
-            aisles_rows[y - 1].append(x)
+            grid_rows[y - 1].append(x)
             print("enemy close - south")
 
         # check diagonal of enemy for areas they could move into - add these ot the grid
         if x == self.gameWorld.getTallonLocation().x + 1 and y == self.gameWorld.getTallonLocation().y + 1: #i.e. the meanie position is 1 to the NORTH EAST than tallon
-            aisles_rows[y + 1].append(x + 1)
+            grid_rows[y + 1].append(x + 1)
             print("enemy close - NE")
         if x == self.gameWorld.getTallonLocation().x - 1 and y == self.gameWorld.getTallonLocation().y + 1: #i.e. the meanie position is 1 to the NORTH WEST than tallon
-            aisles_rows[y + 1].append(x - 1)
+            grid_rows[y + 1].append(x - 1)
             print("enemy close - NW")
         if x == self.gameWorld.getTallonLocation().x + 1 and y == self.gameWorld.getTallonLocation().y - 1: #i.e. the meanie position is 1 to the SOUTH EAST than tallon
-            aisles_rows[y - 1].append(x + 1)
+            grid_rows[y - 1].append(x + 1)
             print("enemy close - SE")
         if x == self.gameWorld.getTallonLocation().x - 1 and y == self.gameWorld.getTallonLocation().y - 1: #i.e. the meanie position is 1 to the SOUTH WEST than tallon
-            aisles_rows[y - 1].append(x - 1)
+            grid_rows[y - 1].append(x - 1)
             print("enemy close - SW")
-        '''
+        
 
 # Get pit state and add this to the grid
 def getPitsStates(self, grid_rows):
