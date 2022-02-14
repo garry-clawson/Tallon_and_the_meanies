@@ -96,24 +96,15 @@ def gridWorld(self):
     rewards = np.full((environment_rows, environment_columns), -1.)
 
     # Define locations (i.e., places that the agent can traverse]) for rows and columns of grid in dictionary
-    aisles_rows = {} #store locations in a dictionary
-
-    # Initialise the dictionary so we can later add states (i.e.m of meanies, pits etc)    
-    aisles_rows[0] = []
-    aisles_rows[1] = []
-    aisles_rows[2] = []
-    aisles_rows[3] = []
-    aisles_rows[4] = []
-    aisles_rows[5] = []
-    aisles_rows[6] = []
-    aisles_rows[7] = []
-    aisles_rows[8] = []
-    aisles_rows[9] = []
+    grid_rows = {} #store locations in a dictionary
+    # Creates the grid to the size of the number of rows (Note: assumes square arena). This is where we will update our states to
+    for i in range(environment_rows):
+      grid_rows[i] = []
     
     # Use the states of the arena to define the states of the grid
-    getMeanieStates(self, aisles_rows)
+    getMeanieStates(self, grid_rows)
     getTallonState(self, rewards)
-    getPitsStates(self, aisles_rows)
+    getPitsStates(self, grid_rows)
     getBonusStates(self, rewards)
     
     # If there are no more bonuses then place a random bonus in the grid - this will keep Tollen moving around after all bonuses are collected
@@ -123,7 +114,7 @@ def gridWorld(self):
     
     #set the rewards for all grid locations at a reward value of -100 (i.e., all pit or meanie positions)
     for row_index in range(0, 10):
-        for column_index in aisles_rows[row_index]:
+        for column_index in grid_rows[row_index]:
             rewards[row_index, column_index] = -100.
 
     #print rewards matrix in terminal so we can see where the meanies and pits etc are for our q_learning
@@ -142,14 +133,14 @@ def getTallonState(self, rewards):
     rewards[y, x] = -1. #0.
 
 #GC Get meanie state and this to the grid
-def getMeanieStates(self, aisles_rows):
+def getMeanieStates(self, grid_rows):
     #print("Meanies state:")
     for i in range(len(self.gameWorld.getMeanieLocation())):
         #print(self.gameWorld.getMeanieLocation()[i].x)
         #print(self.gameWorld.getMeanieLocation()[i].y)
         x = self.gameWorld.getMeanieLocation()[i].x
         y = self.gameWorld.getMeanieLocation()[i].y
-        aisles_rows[y].append(x)
+        grid_rows[y].append(x)
 
         '''
         # The q_learning will only plot a path avoiding obsticles (i.e. rewards of -100) using the current available view
@@ -201,14 +192,14 @@ def getMeanieStates(self, aisles_rows):
         '''
 
 # Get pit state and add this to the grid
-def getPitsStates(self, aisles_rows):
+def getPitsStates(self, grid_rows):
     #print("Pit state:")
     for i in range(len(self.gameWorld.getPitsLocation())):
         #print(self.gameWorld.getMeanieLocation()[i].x)
         #print(self.gameWorld.getMeanieLocation()[i].y)
         x = self.gameWorld.getPitsLocation()[i].x
         y = self.gameWorld.getPitsLocation()[i].y
-        aisles_rows[y].append(x)
+        grid_rows[y].append(x)
 
 #Get bonus state and add this to the grid
 def getBonusStates(self, rewards):
