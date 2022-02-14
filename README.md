@@ -13,13 +13,16 @@ I deceived to try my hand at Q-Learning and the Epsilon Greedy Algorithm. More c
 
 ### Scoring 40 points
 
-https://user-images.githubusercontent.com/44243266/153960228-84486f33-afc5-4f6f-99a0-e34f2a9990ec.mov
+https://user-images.githubusercontent.com/44243266/153961130-d83f82ba-c9f0-4fba-86b2-bf451626126b.mov
 
 ### Evading the Meanies once all bonuses have been collected
 
-https://user-images.githubusercontent.com/44243266/153960246-adb7a8dc-3c7a-4deb-87b5-777eb78c21bf.mo
+https://user-images.githubusercontent.com/44243266/153961145-6dd17df5-f019-4076-95f6-acba418a6c35.mov
 
 ### Meanies covering the last bonus so my Q-Learning has no where to plot a path to :(
 
-https://user-images.githubusercontent.com/44243266/153960263-a9b7fefb-ace4-4bc3-9147-7c6e4097f8f3.mov
+https://user-images.githubusercontent.com/44243266/153961155-b2e360e8-b772-4cce-99ed-555d6f498bd3.mov
+
+
+
 
