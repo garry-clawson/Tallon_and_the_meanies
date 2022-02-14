@@ -335,94 +335,58 @@ def q_learning(self):
             #    print(row)
 
     print('Training complete!')
-
+S
 
 # Define the Talon class as per requirements ot run the program from a vanilla project using just a tallon.py file
 class Tallon():
 
     def __init__(self, arena):
 
-        # Make a copy of the world an attribute, so that Tallon can
-        # query the state of the world
+        # Make a copy of the world an attribute, so that Tallon can query the state of the world
         self.gameWorld = arena
 
-        # What moves are possible.
+        # Define what moves are possible to Tallon
         self.moves = [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]
         
     def makeMove(self):
         # This is the function you need to define
 
-        # For now we have a placeholder, which always moves Tallon
-        # directly towards any existing bonuses. << GC this is key
-        # It ignores Meanies  >> GC we need to upade this to caputure thoise probabalistic pit action
-        # and pits.
-        # 
+        # For now we have a placeholder, which always moves Tallon directly towards any existing bonuses
+        # It ignores Meanies and pits.
+        
         # Get the location of the Bonuses.
-
-        # ------ GC NOTES ----------------
-        #
-        # Process: Think bellman equation, value iteration, stragty and policies, q-learning
-        # Find the current states of the grid
-        # then calculate the stae values and probablities
-        # move acoording to what the baddies can do if they are near you
-        # if you have found all the bonuesses then keep moving away
-        # focuis on the whole stae first
-        #
-        # ----- GC END NOTES --------------
-
         allBonuses = self.gameWorld.getBonusLocation()
 
-        # if there are still bonuses, move towards the next one. << GC does this include the 0.95 probablity aspect?
+        # if there are still bonuses move towards the next one. If not then create a bonus in the q_learning grid so the game keeps playing
         if len(allBonuses) > 0:
 
-            #GC print game state
+            # Print start of game state header and also game state so we know were all the grid participants are
             print(" ---- GAME STATE: ----")
             #printGameState(self)
 
-            # GC how to print an object https://www.delftstack.com/howto/python/print-object-python/ 
-            #myPosition.print()
-
-
-            # GC create gridworld for q_learning process to identify next move E/W/N/S
+            # Call gridWorld function so we can create the state of the arena for the q_learnign process
             gridWorld(self)
 
-            # GC takes the sta eof the gridWorld form above and applies q_learning over 1000 iterations
+            # Take the created state of the gridWorld and apply q_learning over 1000 iterations
             # returns the shortest path to the reward which avoids all meanies and pits etc (everything with -100 negative reward)
             # the first value fo this will be used to move the tallon to its next position
             # we should see that the path stays the same when the tallen moves unless blocked, then a new path will provail
             q_learning(self)
 
-            # GC prints shortest path after the q_learnign has completed
-            # the shortest path is form tallons current location in the grid
+            # Prints the shortest path after the q_learnign process
+            # Returns the shortest path to the reward which avoids all meanies and pits in that current state (i.e. everything with -100 reward)
             getShortestPath = get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)
             print("Shortest path (row, column): ", get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)) 
 
-            # TODO create function that compares current position (1st array item) and next move and moves that way using return.Directions.EAST etc
 
-            #print 2nd item in array
-
+            # Define the variables to hold the first [0] and second [1[] path positions from the geSthortestPath function
             currentPosition = getShortestPath[0]
-            #print("current position: ", currentPosition)
             nextPosition = getShortestPath[1]
-            #print("next position: ", nextPosition)
 
-            #positions for y and x
-            #print("current position y: ", currentPosition[0])
-            #print("current position x: ", currentPosition[1])
-            #print("next position y: ", nextPosition[0])
-            #print("next position x: ", nextPosition[1])
 
-            # GC East is left in the map and should be to avoid an enemy
-            # GC tallon is updated through ther world.py file and updatetallon() function from game.py
-            # If not at the same x coordinate, reduce the difference
-            # The next position is only different by 1 value as it can only move in 1 direction
-            # so we check to see which position that is and then move in that direction using directions.EAST etc
-            # since were are just using the shortestPath to get out positions these co-ordinates are in y, x (as in numpy array row then column)
-            # the Tallons position is in x, y. This is whey when we get the shortest path we specify y then x to get our starting point iin the righty position
-
-            
-            # The positions here are defined on the grid with 'further' menaing to the down and right
-            # Inspired by S. Parsons move code commented aout below
+            # As we know the meanies (dynamic) and pits (static) positions we will plan a trajectory that avoids them using the shortest path
+            # We do this by comparing the current and next position on the grid and moving in the required direction to avoid all obsticles but also moves us closer to the bonus
+            # INSPIRED BY >> S. Parsons makeMove() code from original tallon.py project file
             if nextPosition[1] > currentPosition[1]: #i.e. the next position is further to the EAST than current
                 return Directions.EAST 
             if nextPosition[1] < currentPosition[1]: #i.e. the next position is further to the WEST than current
@@ -431,33 +395,12 @@ class Tallon():
                 return Directions.NORTH
             if nextPosition[0] > currentPosition[0]: #i.e. the next position is further to the SOUTH than current
                 return Directions.SOUTH
-            
-            
-
-
-
-            '''
-            # GC East is left in the map and should be to avoid an enemy
-            # GC tallon is updated through ther world.py file and updatetallon() function from game.py
-            # If not at the same x coordinate, reduce the difference
-            if nextBonus.x > myPosition.x:
-                return Directions.EAST # GC note that EAST is an enum
-            if nextBonus.x < myPosition.x:
-                return Directions.WEST
-            # If not at the same y coordinate, reduce the difference
-            if nextBonus.y < myPosition.y:
-                return Directions.NORTH
-            if nextBonus.y > myPosition.y:
-                return Directions.SOUTH
-            '''
-        
-
-        # if there are no more bonuses, Tallon doesn't move
-        # GC The bonuses are made up of an array list - check how this builds up?
-
-        # If no bonusses are left then randomly create one to act as somewhere to move
+       
+        # If no bonusses are left then randomly create one to provide somewhere for the q_learning process to target so Tallon can move
+        # Resuse the above code functions to enable the movements (yep, should follow the DRY principle here)
+        # This will now continue trying the build up clock points until Tallon is either captured or falls into a pit (somehow)
         else: 
-          print(" ---- NO LOOT SO JUST OVOID MEANIES: ----")
+          print(" ---- NO LOOT LEFT SO JUST AVOID MEANIES & PITS: ----")
           printGameState(self)
           gridWorld(self)
           q_learning(self)
@@ -466,10 +409,8 @@ class Tallon():
           print("Shortest path (row, column): ", get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)) 
 
           currentPosition = getShortestPath[0]
-
           nextPosition = getShortestPath[1]
 
-          # Inspired by S. Parsons move code commented aout below
           if nextPosition[1] > currentPosition[1]: #i.e. the next position is further to the EAST than current
               return Directions.EAST 
           if nextPosition[1] < currentPosition[1]: #i.e. the next position is further to the WEST than current
