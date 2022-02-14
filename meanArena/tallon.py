@@ -243,8 +243,8 @@ def get_starting_location():
     current_column_index = np.random.randint(environment_columns)
   return current_row_index, current_column_index
 
-#define a function that will choose a random, non-terminal starting location
-def last_for_as_long_as_posisble():
+#define a function that will choose a random, non-terminal point for a bonus
+def random_bonus_position():
   #get a random row and column index
   current_row_index = np.random.randint(environment_rows)
   current_column_index = np.random.randint(environment_columns)
@@ -253,7 +253,7 @@ def last_for_as_long_as_posisble():
   while is_terminal_state(current_row_index, current_column_index):
     current_row_index = np.random.randint(environment_rows)
     current_column_index = np.random.randint(environment_columns)
-    rewards[current_column_index, current_row_index] = 99.
+  rewards[current_column_index, current_row_index] = 99.
   #return current_row_index, current_column_index
 
 # ----------------- define a function that determines if the specified location is a terminal state -------------------------
@@ -447,6 +447,7 @@ class Tallon():
 
             
             # The positions here are defined on the grid with 'further' menaing to the down and right
+            # Inspired by S. Parsons move code commented aout below
             if nextPosition[1] > currentPosition[1]: #i.e. the next position is further to the EAST than current
                 return Directions.EAST 
             if nextPosition[1] < currentPosition[1]: #i.e. the next position is further to the WEST than current
@@ -479,5 +480,6 @@ class Tallon():
         # if there are no more bonuses, Tallon doesn't move
         # GC The bonuses are made up of an array list - check how this builds up?
 
+        # If no bonusses are left then randomly create one to act as somewhere to move
         if len(allBonuses) == 0:  
-          last_for_as_long_as_posisble()
+            random_bonus_position()
