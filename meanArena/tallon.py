@@ -55,6 +55,7 @@
 from glob import glob
 from pickle import NONE
 from re import X
+from sre_parse import State
 import numpy as np
 import string
 
@@ -62,7 +63,7 @@ import string
 import world
 import random
 import utils
-from utils import Directions
+from utils import Directions, State
 
 
 # ================ Global variables and parameters ====================
@@ -115,6 +116,7 @@ def gridWorld(self):
     # If there are no more bonuses then place a random bonus in the grid - this will keep Tollen moving around after all bonuses are collected
     if 99 not in rewards: 
       print('random bonus added')
+      getRandomBonusState(rewards) #Do this twice so there is something on the grid (the more meanies the more chance this is covered)
       getRandomBonusState(rewards)
     
     #set the rewards for all grid locations at a reward value of -100 (i.e., all pit or meanie positions)
@@ -166,33 +168,38 @@ def getMeanieStates(self, grid_rows):
         #     0 0 0           T   x 0 0
         #
         # Another option could also be to give the meanies a really bad reward (say -500), so really promote avoiding them
-        
+        '''
         # check directly adjacent areas the meanies could move into >> protect 1 x move ahead but reduces potential paths on the grid
-        if x == self.gameWorld.getTallonLocation().x + 2: #i.e. the meanie position is 2 to the EAST than Tallon
+        if x == self.gameWorld.getTallonLocation().x + 2: #i.e. the meanie position is 2 to the EAST (right) of Tallon
             grid_rows[y].append(x + 1)
             print("enemy close - east")
-        if x == self.gameWorld.getTallonLocation().x - 2: #i.e. the meanie position is 2 to the WEST than Tallon
+        if x == self.gameWorld.getTallonLocation().x - 2: #i.e. the meanie position is 2 to the WEST (left) of Tallon
             grid_rows[y].append(x - 1)
             print("enemy close - west")
-        if y == self.gameWorld.getTallonLocation().y + 2: #i.e. the meanie position is 2 to the NORTH than Tallon
+        if y == self.gameWorld.getTallonLocation().y + 2: #i.e. the meanie position is 2 to the NORTH (top) of Tallon
             grid_rows[y + 1].append(x)
             print("enemy close - north")
-        if y == self.gameWorld.getTallonLocation().y - 2: #i.e. the meanie position is 2 to the SOUTH than Tallon
+        if y == self.gameWorld.getTallonLocation().y - 2: #i.e. the meanie position is 2 to the SOUTH (bottom) of Tallon
             grid_rows[y - 1].append(x)
             print("enemy close - south")
+        '''
 
-        # check diagonal of enemy for areas they could move into - add these ot the grid
-        if x == self.gameWorld.getTallonLocation().x + 1 and y == self.gameWorld.getTallonLocation().y + 1: #i.e. the meanie position is 1 to the NORTH EAST than tallon
-            grid_rows[y + 1].append(x + 1)
+        x = self.gameWorld.getMeanieLocation()[i].x
+        y = self.gameWorld.getMeanieLocation()[i].y
+
+        # check diagonal of meanie for areas they could move into - add these to the grid of places to avoid (i.e. low reward of -100)
+        # Note: the grid has origin points of 0,0 in the top left (which is why to get to the NE requires a move of -Y and +X)
+        if x == self.gameWorld.getTallonLocation().x + 1 and y == self.gameWorld.getTallonLocation().y - 1: #i.e. the meanie position is 1 to the NORTH EAST of Tallon
+            grid_rows[y + 1].append(x - 1) # These points are different as the x,y axis is switched in the gridWorld Vs Tallon's world (y,x Vs x,y respectivley)
             print("enemy close - NE")
-        if x == self.gameWorld.getTallonLocation().x - 1 and y == self.gameWorld.getTallonLocation().y + 1: #i.e. the meanie position is 1 to the NORTH WEST than tallon
-            grid_rows[y + 1].append(x - 1)
-            print("enemy close - NW")
-        if x == self.gameWorld.getTallonLocation().x + 1 and y == self.gameWorld.getTallonLocation().y - 1: #i.e. the meanie position is 1 to the SOUTH EAST than tallon
-            grid_rows[y - 1].append(x + 1)
-            print("enemy close - SE")
-        if x == self.gameWorld.getTallonLocation().x - 1 and y == self.gameWorld.getTallonLocation().y - 1: #i.e. the meanie position is 1 to the SOUTH WEST than tallon
+        if x == self.gameWorld.getTallonLocation().x - 1 and y == self.gameWorld.getTallonLocation().y - 1: #i.e. the meanie position is 1 to the NORTH WEST of Tallon
             grid_rows[y - 1].append(x - 1)
+            print("enemy close - NW")
+        if x == self.gameWorld.getTallonLocation().x + 1 and y == self.gameWorld.getTallonLocation().y + 1: #i.e. the meanie position is 1 to the SOUTH EAST of Tallon
+            grid_rows[y + 1].append(x + 1)
+            print("enemy close - SE")
+        if x == self.gameWorld.getTallonLocation().x - 1 and y == self.gameWorld.getTallonLocation().y + 1: #i.e. the meanie position is 1 to the SOUTH WEST of Tallon
+            grid_rows[y - 1].append(x + 1)
             print("enemy close - SW")
         
 
@@ -381,7 +388,7 @@ class Tallon():
 
         # Main game program which calls the functional requirements for the q_learning AI
         # if there are still bonuses move towards the next one. Else, create a new bonus in the q_learning grid so the game keeps playing
-        if len(allBonuses) > 0:
+        if len(allBonuses) > 1:
 
             # Print start of game state header and also game state so we know were all the grid participants are
             print(" ---- GAME STATE: ----")
@@ -401,23 +408,25 @@ class Tallon():
             getShortestPath = get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)
             print("Shortest path (row, column): ", get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)) 
 
+            if getShortestPath == []:
+              print("There is no shortest path - game lost")
+              return State.LOST
+            else:
+              # Define the variables to hold the first [0] and second [1[] path positions from the geSthortestPath function
+              currentPosition = getShortestPath[0]
+              nextPosition = getShortestPath[1]
 
-            # Define the variables to hold the first [0] and second [1[] path positions from the geSthortestPath function
-            currentPosition = getShortestPath[0]
-            nextPosition = getShortestPath[1]
-
-
-            # As we know the meanies (dynamic) and pits (static) positions we will plan a trajectory that avoids them using the shortest path
-            # We do this by comparing the current and next position on the grid and moving in the required direction to avoid all obsticles but also moves us closer to the bonus
-            # INSPIRED BY >> S. Parsons makeMove() code from original tallon.py project file
-            if nextPosition[1] > currentPosition[1]: #i.e. the next position is further to the EAST than current
-                return Directions.EAST 
-            if nextPosition[1] < currentPosition[1]: #i.e. the next position is further to the WEST than current
-                return Directions.WEST
-            if nextPosition[0] < currentPosition[0]: #i.e. the next position is further to the NORTH than current
-                return Directions.NORTH
-            if nextPosition[0] > currentPosition[0]: #i.e. the next position is further to the SOUTH than current
-                return Directions.SOUTH
+              # As we know the meanies (dynamic) and pits (static) positions we will plan a trajectory that avoids them using the shortest path
+              # We do this by comparing the current and next position on the grid and moving in the required direction to avoid all obsticles but also moves us closer to the bonus
+              # INSPIRED BY >> S. Parsons makeMove() code from original tallon.py project file
+              if nextPosition[1] > currentPosition[1]: #i.e. the next position is further to the EAST than current
+                  return Directions.EAST 
+              if nextPosition[1] < currentPosition[1]: #i.e. the next position is further to the WEST than current
+                  return Directions.WEST
+              if nextPosition[0] < currentPosition[0]: #i.e. the next position is further to the NORTH than current
+                  return Directions.NORTH
+              if nextPosition[0] > currentPosition[0]: #i.e. the next position is further to the SOUTH than current
+                  return Directions.SOUTH
        
         # If no bonusses are left then randomly create one to provide somewhere for the q_learning process to target so Tallon can move
         # Resuse the above code functions to enable the movements (yep, should follow the DRY principle here)
@@ -431,15 +440,19 @@ class Tallon():
           getShortestPath = get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)
           print("Shortest path (row, column): ", get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)) 
 
-          currentPosition = getShortestPath[0]
-          nextPosition = getShortestPath[1]
+          if getShortestPath == []:
+            print("There is no shortest path - game lost")
+            return State.LOST
+          else:
+            currentPosition = getShortestPath[0]
+            nextPosition = getShortestPath[1]
 
-          if nextPosition[1] > currentPosition[1]: #i.e. the next position is further to the EAST than current
-              return Directions.EAST 
-          if nextPosition[1] < currentPosition[1]: #i.e. the next position is further to the WEST than current
-              return Directions.WEST
-          if nextPosition[0] < currentPosition[0]: #i.e. the next position is further to the NORTH than current
-              return Directions.NORTH
-          if nextPosition[0] > currentPosition[0]: #i.e. the next position is further to the SOUTH than current
-              return Directions.SOUTH
+            if nextPosition[1] > currentPosition[1]: #i.e. the next position is further to the EAST than current
+                return Directions.EAST 
+            if nextPosition[1] < currentPosition[1]: #i.e. the next position is further to the WEST than current
+                return Directions.WEST
+            if nextPosition[0] < currentPosition[0]: #i.e. the next position is further to the NORTH than current
+                return Directions.NORTH
+            if nextPosition[0] > currentPosition[0]: #i.e. the next position is further to the SOUTH than current
+                return Directions.SOUTH
             
