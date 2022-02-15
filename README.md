@@ -72,7 +72,7 @@ https://user-images.githubusercontent.com/44243266/153961155-b2e360e8-b772-4cce-
 Key:
 
 - 99 = bonuses to try and get
-- - 1 = spaces we can move about in the gridWorld
+- -1 = spaces we can move about in the gridWorld
 - -100 = meenaies or pits
 
 Note: We cannot see Tallon as they also have a value of -100. However the shortest path printout always shows Tallons position as the starting element (below this is position 9,9 in a row,column format, the next is 8,8 and so on...)
