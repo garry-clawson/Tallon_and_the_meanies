@@ -31,10 +31,10 @@ while not(gameWorld.isEnded()):
     gameWorld.updateClock()
     gameWorld.addMeanie()
     gameWorld.updateScore()
-    #display.update()
+    display.update()
     # Uncomment this for a printout of world state every step
     #utils.printGameState(gameWorld)
-    #time.sleep(1)
+    time.sleep(1)
 
-#print("Final score:", gameWorld.getScore())
-print(gameWorld.getScore())
+print("Final score:", gameWorld.getScore())
+
