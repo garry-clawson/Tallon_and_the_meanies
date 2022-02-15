@@ -36,4 +36,5 @@ while not(gameWorld.isEnded()):
     #utils.printGameState(gameWorld)
     #time.sleep(1)
 
-print("Final score:", gameWorld.getScore())
+#print("Final score:", gameWorld.getScore())
+print(gameWorld.getScore())
