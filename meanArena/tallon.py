@@ -115,12 +115,12 @@ def gridWorld(self):
     
     # If there are no more bonuses then place a random bonus in the grid - this will keep Tollen moving around after all bonuses are collected
     if 99 not in rewards: 
-      print('random bonus added')
+      #print('New Random Bonus added to gridWorld')
       getRandomBonusState(rewards) #Do this twice so there is something on the grid (the more meanies the more chance this is covered)
       getRandomBonusState(rewards)
     
     #set the rewards for all grid locations at a reward value of -100 (i.e., all pit or meanie positions)
-    for row_index in range(0, 10):
+    for row_index in range(environment_rows):
         for column_index in grid_rows[row_index]:
             rewards[row_index, column_index] = -100.
 
@@ -191,16 +191,16 @@ def getMeanieStates(self, grid_rows):
         # Note: the grid has origin points of 0,0 in the top left (which is why to get to the NE requires a move of -Y and +X)
         if x == self.gameWorld.getTallonLocation().x + 1 and y == self.gameWorld.getTallonLocation().y - 1: #i.e. the meanie position is 1 to the NORTH EAST of Tallon
             grid_rows[y + 1].append(x - 1) # These points are different as the x,y axis is switched in the gridWorld Vs Tallon's world (y,x Vs x,y respectivley)
-            print("enemy close - NE")
+            #print("enemy close - NE")
         if x == self.gameWorld.getTallonLocation().x - 1 and y == self.gameWorld.getTallonLocation().y - 1: #i.e. the meanie position is 1 to the NORTH WEST of Tallon
             grid_rows[y - 1].append(x - 1)
-            print("enemy close - NW")
+            #print("enemy close - NW")
         if x == self.gameWorld.getTallonLocation().x + 1 and y == self.gameWorld.getTallonLocation().y + 1: #i.e. the meanie position is 1 to the SOUTH EAST of Tallon
             grid_rows[y + 1].append(x + 1)
-            print("enemy close - SE")
+            #print("enemy close - SE")
         if x == self.gameWorld.getTallonLocation().x - 1 and y == self.gameWorld.getTallonLocation().y + 1: #i.e. the meanie position is 1 to the SOUTH WEST of Tallon
             grid_rows[y - 1].append(x + 1)
-            print("enemy close - SW")
+            #print("enemy close - SW")
         
 
 # Get pit state and add this to the grid
@@ -315,7 +315,7 @@ def get_next_location(current_row_index, current_column_index, action_index):
 def get_shortest_path(start_row_index, start_column_index):
   # Return empty array if this is an invalid starting location
   if is_terminal_state(start_row_index, start_column_index):
-    print("TERMINAL STATE")
+    #print("TERMINAL STATE")
     return []
   else: # If this is an available starting location
     current_row_index, current_column_index = start_row_index, start_column_index
@@ -406,10 +406,10 @@ class Tallon():
             # Prints the shortest path after the q_learnign process
             # Returns the shortest path to the reward which avoids all meanies and pits in that current state (i.e. everything with -100 reward)
             getShortestPath = get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)
-            print("Shortest path (row, column): ", get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)) 
+            print("Shortest Path to next Bonus (row, column): ", get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)) 
 
             if getShortestPath == []:
-              print("There is no shortest path - game lost")
+              #print("There is no shortest path - game lost")
               return State.LOST
             else:
               # Define the variables to hold the first [0] and second [1[] path positions from the geSthortestPath function
@@ -432,7 +432,7 @@ class Tallon():
         # Resuse the above code functions to enable the movements (yep, should follow the DRY principle here)
         # This will now continue trying the build up clock points until Tallon is either captured or falls into a pit (somehow)
         else: 
-          print("\n ---- NO LOOT LEFT SO JUST AVOID MEANIES & PITS: ----")
+          #print("\n ---- NO LOOT LEFT SO JUST AVOID MEANIES & PITS: ----")
           #printGameState(self)
           gridWorld(self)
           q_learning(self)
@@ -441,7 +441,7 @@ class Tallon():
           print("Shortest path (row, column): ", get_shortest_path(self.gameWorld.getTallonLocation().y, self.gameWorld.getTallonLocation().x)) 
 
           if getShortestPath == []:
-            print("There is no shortest path - game lost")
+            #print("There is no shortest path - game lost")
             return State.LOST
           else:
             currentPosition = getShortestPath[0]
