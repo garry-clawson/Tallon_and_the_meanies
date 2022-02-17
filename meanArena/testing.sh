@@ -7,5 +7,5 @@
 
 for ((i=1; i<=50; i++))
 do
-    python3 game.py >> 50_results_10by10_1m_3p_3b_8v.txt
+    python3 game.py >> 50_results_10by10_1m_1i_3p_3b_original.txt
 done

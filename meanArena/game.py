@@ -38,3 +38,4 @@ while not(gameWorld.isEnded()):
 
 print("Final score:", gameWorld.getScore())
 
+

@@ -9,7 +9,7 @@
 # Notes:    This program implements the q_learning AI system with epsilon greedy algorithm to choose next action and encourage exploration
 # Credits:  Credits are noted throughout the code
 #
-# Areas to improve: 0) Note: Very very occasionally (found through the testing I did), on my machine the program hangs for no obvious reason. If this happens 
+# Areas to improve: 0) Note: Very very occasionally (found through the testing I did), the program will hang. If this happens 
 #                   please just retart the game. I have not been able to track this down as it happens so rarely. 
 # 
 #                   1) A meanie state supercedes other states as they move through the gridworld. Therefdore can step and 'hide' on a bonus (say the last bonus) or pit
@@ -432,7 +432,7 @@ class Tallon():
         # Resuse the above code functions to enable the movements (yep, should follow the DRY principle here)
         # This will now continue trying the build up clock points until Tallon is either captured or falls into a pit (somehow)
         else: 
-          #print("\n ---- NO LOOT LEFT SO JUST AVOID MEANIES & PITS: ----")
+          print("\n ---- NO LOOT LEFT SO JUST AVOID MEANIES & PITS: ----")
           #printGameState(self)
           gridWorld(self)
           q_learning(self)
