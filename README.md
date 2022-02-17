@@ -2,7 +2,7 @@
 
 The aim of this project was to implement some sort of AI technique to escape and evade the meanies while avoiding pits and collecting bonuses. 
 
-I deceived to try my hand at Q-Learning and the Epsilon Greedy Algorithm. More can be read about these here:
+I decided to try my hand at Q-Learning and the Epsilon Greedy Algorithm. More can be read about these here:
 
 - https://www.geeksforgeeks.org/q-learning-in-python/ 
 - https://www.learndatasci.com/tutorials/reinforcement-q-learning-scratch-python-openai-gym/
