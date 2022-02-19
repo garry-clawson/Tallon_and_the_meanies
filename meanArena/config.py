@@ -13,8 +13,8 @@ worldBreadth = 10
 
 # Features
 numberOfMeanies = 1 # How many we start with
-numberOfPits = 2
-numberOfBonuses = 2
+numberOfPits = 3
+numberOfBonuses = 3
 
 # Control dynamism
 #
