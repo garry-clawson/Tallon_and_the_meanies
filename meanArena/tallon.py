@@ -2,10 +2,10 @@
 #
 # Name:     Garry Clawson
 # ID:       18685030
-# Date:     14th Jan 2022
+# Date:     17th Feb 2022
 # Module:   CMP9132M
 # Title:    AAI Assignment 2
-# Version:  0.1.0
+# Version:  0.5.0
 # Notes:    This program implements the q_learning AI system with epsilon greedy algorithm to choose next action and encourage exploration
 # Credits:  Credits are noted throughout the code
 #
