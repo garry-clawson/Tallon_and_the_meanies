@@ -66,6 +66,46 @@ https://user-images.githubusercontent.com/44243266/153962153-b9340ad9-30e7-4fd3-
 
 https://user-images.githubusercontent.com/44243266/153961155-b2e360e8-b772-4cce-99ed-555d6f498bd3.mov
 
+### Interesting Evasion
+
+https://user-images.githubusercontent.com/44243266/155014651-7cca0729-9f76-4c0e-bc3d-ff32ab955abd.mov
+
+### 41 Points Game
+
+https://user-images.githubusercontent.com/44243266/155014721-ceda944a-8977-4d63-b414-8a5ffbb17c55.mov
+
+### 38 Points Game
+
+https://user-images.githubusercontent.com/44243266/155014765-124a7166-0f32-43e3-a644-088223f1877f.mov
+
+### Bonus or More Time Dilemma
+
+https://user-images.githubusercontent.com/44243266/155014929-97fa3e2e-c538-47cb-869f-9a7d19262cf2.mov
+
+### 41 Points Version 2
+
+https://user-images.githubusercontent.com/44243266/155014977-a404940c-7645-48cb-8ad1-4cbda5916897.mov
+
+### 39 Points Game
+
+https://user-images.githubusercontent.com/44243266/155015010-346ef8fe-5cba-4c67-b67e-8ca92ba7af8d.mov
+
+### 30 POint Game with Intersting Action
+
+https://user-images.githubusercontent.com/44243266/155015053-e373b53e-850c-4c46-980d-82a3992a7bd0.mov
+
+### 36 Point Game
+
+https://user-images.githubusercontent.com/44243266/155015084-459e7ff6-8b8c-4c4b-a2fd-9dc649558110.mov
+
+### 37 Point Game
+
+https://user-images.githubusercontent.com/44243266/155015103-9bae591e-c205-4aed-ac15-9e0558009857.mov
+
+### Getting Boxed In
+
+https://user-images.githubusercontent.com/44243266/155015134-db99eb0a-e294-4004-9b10-0483351cad53.mov
+
 
 ### Example gridWorld game state for 45 points game
 
